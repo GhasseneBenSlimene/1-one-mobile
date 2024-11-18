@@ -3,17 +3,25 @@ package com.example.advencedhelloworld.data.local;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
 @Dao
 public interface RiskEvaluationDao {
+    @Insert
+    void insert(RiskEvaluation risk);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<RiskEvaluation> risks);
+    @Update
+    void update(RiskEvaluation risk);
 
     @Query("SELECT * FROM risk_evaluations")
     LiveData<List<RiskEvaluation>> getAllRisks();
+
+    @Query("DELETE FROM risk_evaluations")
+    void clearAll();
+
+    @Query("SELECT EXISTS(SELECT 1 FROM risk_evaluations WHERE id = :id)")
+    boolean exists(int id);
 }

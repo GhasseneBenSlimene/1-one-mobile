@@ -9,32 +9,38 @@ public class RiskEvaluation {
     private int id;
     private String title;
     private String description;
-    private int riskLevel;
+    private long lastModified;  // Timestamp pour gérer les conflits
 
-    public RiskEvaluation(String title, String description, int riskLevel) {
-        this.title = title;
-        this.description = description;
-        this.riskLevel = riskLevel;
-    }
-
-    // Getters et Setters
+    // Getters et setters
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getDescription() {
         return description;
     }
 
-    public int getRiskLevel() {
-        return riskLevel;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public long getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
     }
 }
