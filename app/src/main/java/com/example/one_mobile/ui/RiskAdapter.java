@@ -1,4 +1,4 @@
-package com.example.advencedhelloworld.ui;
+package com.example.one_mobile.ui;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -6,8 +6,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.advencedhelloworld.R;
-import com.example.advencedhelloworld.data.local.RiskEvaluation;
+import com.example.one_mobile.R;
+import com.example.one_mobile.data.local.RiskEvaluation;
 
 import java.util.ArrayList;
 import java.util.List;

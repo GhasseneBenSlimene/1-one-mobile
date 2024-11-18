@@ -1,10 +1,10 @@
-package com.example.advencedhelloworld.viewmodel;
+package com.example.one_mobile.viewmodel;
 
 import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import com.example.advencedhelloworld.data.local.RiskEvaluation;
-import com.example.advencedhelloworld.data.repository.RiskRepository;
+import com.example.one_mobile.data.local.RiskEvaluation;
+import com.example.one_mobile.data.repository.RiskRepository;
 
 import java.util.List;
 

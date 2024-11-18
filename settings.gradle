@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Advenced Hello World"
+rootProject.name = "one_mobile"
 include ':app'

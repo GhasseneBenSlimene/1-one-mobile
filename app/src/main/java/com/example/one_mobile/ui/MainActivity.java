@@ -1,12 +1,12 @@
-package com.example.advencedhelloworld.ui;
+package com.example.one_mobile.ui;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.advencedhelloworld.R;
-import com.example.advencedhelloworld.viewmodel.RiskViewModel;
+import com.example.one_mobile.R;
+import com.example.one_mobile.viewmodel.RiskViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private RiskViewModel viewModel;

@@ -1,6 +1,6 @@
-package com.example.advencedhelloworld.data.network;
+package com.example.one_mobile.data.network;
 
-import com.example.advencedhelloworld.data.local.RiskEvaluation;
+import com.example.one_mobile.data.local.RiskEvaluation;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;

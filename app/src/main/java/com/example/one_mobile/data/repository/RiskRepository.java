@@ -1,14 +1,14 @@
-package com.example.advencedhelloworld.data.repository;
+package com.example.one_mobile.data.repository;
 
 import android.app.Application;
 import androidx.lifecycle.LiveData;
-import com.example.advencedhelloworld.data.local.AppDatabase;
-import com.example.advencedhelloworld.data.local.RiskEvaluation;
-import com.example.advencedhelloworld.data.local.RiskEvaluationDao;
-import com.example.advencedhelloworld.data.local.SyncQueue;
-import com.example.advencedhelloworld.data.local.SyncQueueDao;
-import com.example.advencedhelloworld.data.network.ApiService;
-import com.example.advencedhelloworld.data.network.RetrofitClient;
+import com.example.one_mobile.data.local.AppDatabase;
+import com.example.one_mobile.data.local.RiskEvaluation;
+import com.example.one_mobile.data.local.RiskEvaluationDao;
+import com.example.one_mobile.data.local.SyncQueue;
+import com.example.one_mobile.data.local.SyncQueueDao;
+import com.example.one_mobile.data.network.ApiService;
+import com.example.one_mobile.data.network.RetrofitClient;
 import com.google.gson.Gson;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.advencedhelloworld;
+package com.example.one_mobile;
 
 import org.junit.Test;
 

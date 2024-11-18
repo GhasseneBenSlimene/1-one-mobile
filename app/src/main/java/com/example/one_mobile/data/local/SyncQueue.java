@@ -1,4 +1,4 @@
-package com.example.advencedhelloworld.data.local;
+package com.example.one_mobile.data.local;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

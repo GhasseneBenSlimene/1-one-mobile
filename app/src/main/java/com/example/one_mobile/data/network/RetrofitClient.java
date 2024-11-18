@@ -1,4 +1,4 @@
-package com.example.advencedhelloworld.data.network;
+package com.example.one_mobile.data.network;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
