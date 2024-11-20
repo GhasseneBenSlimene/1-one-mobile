@@ -69,12 +69,14 @@ public class RiskRepository {
      */
     public void deleteRisk(RiskEvaluation risk) {
         executor.execute(() -> {
-            riskDao.update(risk);
+            riskDao.delete(risk);
+            // Enregistre dans la file de synchronisation pour le supprimer du serveur plus tard
             String payload = gson.toJson(risk);
             SyncQueue syncAction = new SyncQueue("DELETE", "risk_evaluations", payload);
             syncQueueDao.insert(syncAction);
         });
     }
+
 
     /**
      * Synchronise les données locales avec le serveur.

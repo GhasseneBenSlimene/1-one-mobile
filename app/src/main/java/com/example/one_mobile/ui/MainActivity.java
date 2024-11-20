@@ -1,22 +1,19 @@
 package com.example.one_mobile.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.ProgressBar;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.local.RiskEvaluation;
 import com.example.one_mobile.viewmodel.RiskViewModel;
 
 public class MainActivity extends AppCompatActivity {
-
-    private RiskViewModel riskViewModel;
-    private RiskAdapter riskAdapter;
-    private ProgressBar progressBar;
+    private RiskViewModel viewModel;
+    private RiskAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,51 +22,38 @@ public class MainActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        riskAdapter = new RiskAdapter();
-        recyclerView.setAdapter(riskAdapter);
 
-        progressBar = findViewById(R.id.progress_bar);
+        viewModel = new ViewModelProvider(this).get(RiskViewModel.class);
 
-        riskViewModel = new ViewModelProvider(this).get(RiskViewModel.class);
+        adapter = new RiskAdapter(this, new RiskAdapter.OnRiskActionListener() {
+            @Override
+            public void onEdit(RiskEvaluation risk) {
+                Intent intent = new Intent(MainActivity.this, EditRiskActivity.class);
+                intent.putExtra("risk", risk);  // Transmettre l'objet RiskEvaluation
+                startActivity(intent);
+            }
 
-        // Observer les risques
-        riskViewModel.getAllRisks().observe(this, risks -> riskAdapter.setRisks(risks));
-
-        // Observer l’état de chargement
-        riskViewModel.getIsLoading().observe(this, isLoading -> {
-            if (isLoading) {
-                progressBar.setVisibility(android.view.View.VISIBLE);
-            } else {
-                progressBar.setVisibility(android.view.View.GONE);
+            @Override
+            public void onDelete(RiskEvaluation risk) {
+                viewModel.deleteRisk(risk);  // Supprimer via le ViewModel
+                Toast.makeText(MainActivity.this, "Risque supprimé", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Boutons pour tester les fonctionnalités
-        Button btnAdd = findViewById(R.id.btn_add);
-        btnAdd.setOnClickListener(v -> {
-            RiskEvaluation risk = new RiskEvaluation();
-            risk.setTitle("Nouveau Risque");
-            risk.setDescription("Description du risque");
-            riskViewModel.addRisk(risk);
+        recyclerView.setAdapter(adapter);
+
+        viewModel.getAllRisks().observe(this, risks -> {
+            if (risks != null) {
+                adapter.submitList(risks);
+            }
         });
 
-        Button btnUpdate = findViewById(R.id.btn_update);
-        btnUpdate.setOnClickListener(v -> {
-            RiskEvaluation risk = new RiskEvaluation();
-            risk.setId(1); // Exemple : mettre à jour l’élément avec ID 1
-            risk.setTitle("Risque Mis à Jour");
-            risk.setDescription("Description mise à jour");
-            riskViewModel.updateRisk(risk);
+
+        // Ajouter un risque
+        findViewById(R.id.btnAdd).setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, EditRiskActivity.class);
+            startActivity(intent);  // Ouvre l'interface pour ajouter un risque
         });
 
-        Button btnDelete = findViewById(R.id.btn_delete);
-        btnDelete.setOnClickListener(v -> {
-            RiskEvaluation risk = new RiskEvaluation();
-            risk.setId(1); // Exemple : supprimer l’élément avec ID 1
-            riskViewModel.deleteRisk(risk);
-        });
-
-        Button btnSync = findViewById(R.id.btn_sync);
-        btnSync.setOnClickListener(v -> riskViewModel.synchronize("2024-01-01T00:00:00Z")); // Exemple de timestamp
     }
 }

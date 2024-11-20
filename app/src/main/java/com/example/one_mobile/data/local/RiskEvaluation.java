@@ -3,13 +3,15 @@ package com.example.one_mobile.data.local;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "risk_evaluations")
-public class RiskEvaluation {
+public class RiskEvaluation implements Serializable {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String title;
     private String description;
-    private long lastModified;  // Timestamp pour gérer les conflits
+    private long lastModified;  // Timestamp pour la synchronisation
 
     // Getters et setters
     public int getId() {

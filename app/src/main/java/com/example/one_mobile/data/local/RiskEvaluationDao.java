@@ -2,6 +2,7 @@ package com.example.one_mobile.data.local;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
@@ -15,6 +16,13 @@ public interface RiskEvaluationDao {
 
     @Update
     void update(RiskEvaluation risk);
+
+    @Query("DELETE FROM risk_evaluations WHERE id = :id")
+    void deleteById(int id);
+
+    @Delete
+    void delete(RiskEvaluation risk);
+
 
     @Query("SELECT * FROM risk_evaluations")
     LiveData<List<RiskEvaluation>> getAllRisks();

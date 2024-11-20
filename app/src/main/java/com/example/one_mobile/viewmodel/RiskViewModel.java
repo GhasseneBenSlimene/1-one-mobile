@@ -62,12 +62,11 @@ public class RiskViewModel extends AndroidViewModel {
      * Supprime un risque existant.
      */
     public void deleteRisk(RiskEvaluation risk) {
-        isLoading.setValue(true);
         new Thread(() -> {
             repository.deleteRisk(risk);
-            isLoading.postValue(false);
         }).start();
     }
+
 
     /**
      * Lance la synchronisation avec le serveur.
