@@ -27,7 +27,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.EditRiskActivity"/>
+        <!-- Home Activity -->
+        <activity android:name=".ui.HomeActivity" />
+         <!-- dangers activity and origin de risque added-->
+        <activity android:name=".ui.DangersActivity" />
+        <activity android:name=".ui.OrigineDeRisqueActivity" />
 
     </application>
 

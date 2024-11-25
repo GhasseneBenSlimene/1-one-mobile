@@ -1,0 +1,48 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/title_document_unique"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Document Unique"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Clickable Items -->
+    <TextView
+        android:id="@+id/item_dangers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dangers"
+        android:padding="12dp"
+        android:textSize="18sp"
+        android:background="@drawable/clickable_item_background"
+        android:textColor="#000000"
+        android:clickable="true"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:id="@+id/item_origine_de_risque"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Origine de risque"
+        android:padding="12dp"
+        android:textSize="18sp"
+        android:background="@drawable/clickable_item_background"
+        android:textColor="#000000"
+        android:clickable="true"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Add more TextViews for other items -->
+
+</LinearLayout>

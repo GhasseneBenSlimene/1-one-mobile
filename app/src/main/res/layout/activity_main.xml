@@ -1,22 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="70dp" />
-
-    <Button
-        android:id="@+id/btnAdd"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ajouter"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="@color/purple_500"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="16dp" />
-</RelativeLayout>
+        android:layout_margin="15dp"
+        android:padding="15dp">
+
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/imageView_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:adjustViewBounds="true"
+            android:maxWidth="180dp"
+            app:srcCompat="@drawable/ic_logo" />
+
+        <!-- Username Input -->
+        <EditText
+            android:id="@+id/editText_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imageView_logo"
+            android:layout_marginTop="30dp"
+            android:hint="@string/email"
+            android:inputType="text"
+            android:padding="12dp"
+            android:background="@drawable/edittext_background"
+            android:imeOptions="actionNext"
+            android:layout_marginBottom="15dp" />
+
+        <!-- Password Input -->
+        <EditText
+            android:id="@+id/editText_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editText_email"
+            android:layout_marginTop="10dp"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:imeOptions="actionDone"
+            android:background="@drawable/edittext_background"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Forgot Password Text -->
+        <TextView
+            android:id="@+id/textView_forgot_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:text="@string/forgot_password"
+            android:textColor="#8BC34A"            android:textStyle="bold"
+            android:layout_below="@id/editText_password"
+            android:layout_alignParentEnd="true"
+            android:clickable="true"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Login Button -->
+        <Button
+            android:id="@+id/button_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editText_password"
+            android:layout_marginTop="20dp"
+            android:text="@string/login"
+            android:padding="12dp"
+            android:backgroundTint="#8BC34A"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+</ScrollView>
