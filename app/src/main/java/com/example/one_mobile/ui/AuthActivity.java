@@ -1,6 +1,7 @@
 package com.example.one_mobile.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,8 +42,12 @@ public class AuthActivity extends AppCompatActivity {
                     // Étape 2 : Authentification
                     authViewModel.authenticate(username, password).observe(this, authResponse -> {
                         if (authResponse != null) {
-                            Toast.makeText(this, "Connexion réussie", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(AuthActivity.this, HomeActivity.class); // Redirection après succès
+                            // Enregistrez le username dans SharedPreferences
+                            SharedPreferences preferences = getSharedPreferences("userPrefs", MODE_PRIVATE);
+                            preferences.edit().putString("username", authResponse.getUsername()).apply();
+
+                            // Redirigez vers l'accueil
+                            Intent intent = new Intent(AuthActivity.this, HomeActivity.class);
                             startActivity(intent);
                             finish();
                         } else {

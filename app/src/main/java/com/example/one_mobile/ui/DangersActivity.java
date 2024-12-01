@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.one_mobile.R;
 
-public class DangersActivity extends AppCompatActivity {
+public class DangersActivity extends BaseActivity {
 
     private TableLayout tableLayout;
 
