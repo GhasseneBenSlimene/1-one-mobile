@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.one_mobile.data.local.RiskEvaluation;
+import com.example.one_mobile.data.model.RiskEvaluation;
 import com.example.one_mobile.data.repository.RiskRepository;
 
 import java.util.List;

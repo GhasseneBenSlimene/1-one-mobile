@@ -3,7 +3,7 @@ package com.example.one_mobile.data.repository;
 import android.app.Application;
 import androidx.lifecycle.LiveData;
 import com.example.one_mobile.data.local.AppDatabase;
-import com.example.one_mobile.data.local.RiskEvaluation;
+import com.example.one_mobile.data.model.RiskEvaluation;
 import com.example.one_mobile.data.local.RiskEvaluationDao;
 import com.example.one_mobile.data.local.SyncQueue;
 import com.example.one_mobile.data.local.SyncQueueDao;

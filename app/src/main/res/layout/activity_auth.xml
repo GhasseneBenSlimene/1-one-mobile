@@ -26,7 +26,7 @@
 
         <!-- Username Input -->
         <EditText
-            android:id="@+id/editText_email"
+            android:id="@+id/editText_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/imageView_logo"
@@ -43,7 +43,7 @@
             android:id="@+id/editText_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/editText_email"
+            android:layout_below="@id/editText_username"
             android:layout_marginTop="10dp"
             android:hint="@string/password"
             android:inputType="textPassword"
