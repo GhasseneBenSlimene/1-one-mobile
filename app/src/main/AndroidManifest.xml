@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.one_mobile">
@@ -30,9 +29,11 @@
 
         <!-- Home Activity -->
         <activity android:name=".ui.HomeActivity" />
-         <!-- dangers activity and origin de risque added-->
+        <!-- Dangers Activity and Origin de Risque added -->
         <activity android:name=".ui.DangersActivity" />
         <activity android:name=".ui.OrigineDeRisqueActivity" />
+        <!-- Evaluation Site Form Activity added -->
+        <activity android:name=".ui.EvaluationSiteFormActivity" />
 
     </application>
 
