@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.HomeActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/imageView_logo"
             android:layout_marginTop="30dp"
-            android:hint="@string/email"
+            android:hint="@string/username"
             android:inputType="text"
             android:padding="12dp"
             android:background="@drawable/edittext_background"
