@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.one_mobile.R;
@@ -25,23 +24,24 @@ public class HomeActivity extends BaseActivity {
         // Set up click listeners
         TextView itemDangers = findViewById(R.id.item_dangers);
         TextView itemOrigineDeRisque = findViewById(R.id.item_origine_de_risque);
+        TextView itemEvaluationSite = findViewById(R.id.item_evaluation_site); // Nouveau item
 
-        itemDangers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to DangersActivity
-                Intent intent = new Intent(HomeActivity.this, DangersActivity.class);
-                startActivity(intent);
-            }
+        itemDangers.setOnClickListener(v -> {
+            // Navigate to DangersActivity
+            Intent intent = new Intent(HomeActivity.this, DangersActivity.class);
+            startActivity(intent);
         });
 
-        itemOrigineDeRisque.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to OrigineDeRisqueActivity
-                Intent intent = new Intent(HomeActivity.this, OrigineDeRisqueActivity.class);
-                startActivity(intent);
-            }
+        itemOrigineDeRisque.setOnClickListener(v -> {
+            // Navigate to OrigineDeRisqueActivity
+            Intent intent = new Intent(HomeActivity.this, OrigineDeRisqueActivity.class);
+            startActivity(intent);
         });
+
+//        itemEvaluationSite.setOnClickListener(v -> {
+//            // Navigate to EvaluationSiteFormActivity
+//            Intent intent = new Intent(HomeActivity.this, EvaluationSiteFormActivity.class);
+//            startActivity(intent);
+//        });
     }
 }
