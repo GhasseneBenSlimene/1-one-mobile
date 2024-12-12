@@ -22,26 +22,5 @@ public class HomeActivity extends BaseActivity {
             getSupportActionBar().setTitle("Document Unique");
         }
 
-        // Set up click listeners
-        TextView itemDangers = findViewById(R.id.item_dangers);
-        TextView itemOrigineDeRisque = findViewById(R.id.item_origine_de_risque);
-
-        itemDangers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to DangersActivity
-                Intent intent = new Intent(HomeActivity.this, DangersActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        itemOrigineDeRisque.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to OrigineDeRisqueActivity
-                Intent intent = new Intent(HomeActivity.this, OrigineDeRisqueActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 }
