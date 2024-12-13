@@ -34,6 +34,8 @@
         <activity android:name=".ui.EvaluationRisqueActionActivity" />
         <activity android:name=".ui.EvaluationRisqueSiteActivity" />
         <activity android:name=".ui.PlansActionUniteActivity" />
+        <activity android:name=".ui.AjouterEvaluationUniteActivity" />
+
 
 
 
