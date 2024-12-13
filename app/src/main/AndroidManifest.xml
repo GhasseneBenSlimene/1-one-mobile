@@ -29,6 +29,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.EvaluationRisqueActivity" />
+        <activity android:name=".ui.EvaluationRisquePosteActivity" />
+        <activity android:name=".ui.EvaluationRisqueActionActivity" />
+        <activity android:name=".ui.EvaluationRisqueSiteActivity" />
+        <activity android:name=".ui.PlansActionUniteActivity" />
+
+
+
         <!-- Auth Activity -->
         <!-- Décommenter cette section et commenter HomeActivity pour revenir à AuthActivity -->
         <!--
