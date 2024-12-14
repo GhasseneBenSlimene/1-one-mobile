@@ -47,7 +47,7 @@ public class AuthActivity extends AppCompatActivity {
                             preferences.edit().putString("username", authResponse.getUsername()).apply();
 
                             // Redirigez vers l'accueil
-                            Intent intent = new Intent(AuthActivity.this, HomeActivity.class);
+                            Intent intent = new Intent(AuthActivity.this, Home.class);
                             startActivity(intent);
                             finish();
                         } else {
