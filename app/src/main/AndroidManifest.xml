@@ -20,13 +20,25 @@
         tools:targetApi="31">
 
         <!-- Configuration pour démarrer directement sur HomeActivity -->
-        <activity android:name=".ui.Home"
+        <!-- <activity android:name=".ui.Home"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> -->
+
+        <!-- Auth Activity -->
+        <!-- Décommenter cette section et commenter HomeActivity pour revenir à AuthActivity -->
+        
+        <activity android:name="com.example.one_mobile.ui.AuthActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+       
 
         <activity android:name=".ui.EvaluationListByUtr" />
         <activity android:name=".ui.EvaluationListByPost" />
@@ -35,20 +47,6 @@
         <activity android:name=".ui.ActionPlansByUtr" />
         <activity android:name=".ui.AddEvaluationByUtr" />
 
-
-
-
-        <!-- Auth Activity -->
-        <!-- Décommenter cette section et commenter HomeActivity pour revenir à AuthActivity -->
-        <!--
-        <activity android:name="com.example.one_mobile.ui.AuthActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        -->
 
 
     </application>
