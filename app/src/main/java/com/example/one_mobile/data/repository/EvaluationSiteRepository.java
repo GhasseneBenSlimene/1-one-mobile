@@ -27,6 +27,7 @@ public class EvaluationSiteRepository {
         apiService = RetrofitClient.getApiService();
     }
 
+    //
     public LiveData<List<Site>> getAllSites() {
         MutableLiveData<List<Site>> sites = new MutableLiveData<>();
         apiService.getAllSites().enqueue(new Callback<List<Site>>() {
@@ -166,4 +167,28 @@ public class EvaluationSiteRepository {
         });
         return createdEvaluationSite;
     }
+
+    //
+    public LiveData<List<EvaluationSite>> getAllEvaluationSites() {
+        MutableLiveData<List<EvaluationSite>> evaluationSites = new MutableLiveData<>();
+        apiService.getAllEvaluationSites().enqueue(new Callback<List<EvaluationSite>>() {
+            @Override
+            public void onResponse(Call<List<EvaluationSite>> call, Response<List<EvaluationSite>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    evaluationSites.setValue(response.body());
+                } else {
+                    evaluationSites.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<EvaluationSite>> call, Throwable t) {
+                evaluationSites.setValue(null);
+            }
+        });
+        return evaluationSites;
+    }
+
 }
+
+

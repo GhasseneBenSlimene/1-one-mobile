@@ -1,8 +1,10 @@
 package com.example.one_mobile.viewmodel;
 
+import android.app.Application;
+
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.Facteur;
@@ -15,13 +17,15 @@ import com.example.one_mobile.data.repository.EvaluationSiteRepository;
 
 import java.util.List;
 
-public class EvaluationSiteViewModel extends ViewModel {
-
+public class EvaluationSiteViewModel extends AndroidViewModel {
     private final EvaluationSiteRepository repository;
+    private final LiveData<List<EvaluationSite>> allEvaluationSites;
     private MutableLiveData<EvaluationSite> createdEvaluationSite;
 
-    public EvaluationSiteViewModel() {
+    public EvaluationSiteViewModel(Application application) {
+        super(application);
         repository = new EvaluationSiteRepository();
+        allEvaluationSites = repository.getAllEvaluationSites();
         createdEvaluationSite = new MutableLiveData<>();
     }
 
@@ -33,9 +37,12 @@ public class EvaluationSiteViewModel extends ViewModel {
         return repository.getAllOrigines();
     }
 
-
     public LiveData<List<Matrice>> getAllMatrices() {
         return repository.getAllMatrices();
+    }
+
+    public LiveData<List<EvaluationSite>> getAllEvaluationSites() {
+        return allEvaluationSites;
     }
 
     public LiveData<List<MatriceFacteur>> getMatriceFacteursByMatriceId(long matriceId) {
