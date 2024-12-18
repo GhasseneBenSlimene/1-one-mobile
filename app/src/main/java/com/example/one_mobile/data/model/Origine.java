@@ -1,10 +1,9 @@
 package com.example.one_mobile.data.model;
 
-public class Site {
+public class Origine {
     private long id;
     private String lib;
     private String code; // Champ ajouté
-    private long effectif;
 
     // Getters et Setters
     public long getId() {
@@ -29,13 +28,5 @@ public class Site {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public long getEffectif() {
-        return effectif;
-    }
-
-    public void setEffectif(long effectif) {
-        this.effectif = effectif;
     }
 }

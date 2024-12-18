@@ -8,6 +8,7 @@ import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Site;
+import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.network.ApiService;
 import com.example.one_mobile.data.network.RetrofitClient;
@@ -44,6 +45,26 @@ public class EvaluationSiteRepository {
             }
         });
         return sites;
+    }
+
+    public LiveData<List<Origine>> getAllOrigines() {
+        MutableLiveData<List<Origine>> origines = new MutableLiveData<>();
+        apiService.getAllOrigines().enqueue(new Callback<List<Origine>>() {
+            @Override
+            public void onResponse(Call<List<Origine>> call, Response<List<Origine>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    origines.setValue(response.body());
+                } else {
+                    origines.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Origine>> call, Throwable t) {
+                origines.setValue(null);
+            }
+        });
+        return origines;
     }
 
     public LiveData<List<Matrice>> getAllMatrices() {

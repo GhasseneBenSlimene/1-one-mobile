@@ -9,6 +9,7 @@ import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Site;
+import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.repository.EvaluationSiteRepository;
 
@@ -27,6 +28,11 @@ public class EvaluationSiteViewModel extends ViewModel {
     public LiveData<List<Site>> getAllSites() {
         return repository.getAllSites();
     }
+
+    public LiveData<List<Origine>> getAllOrigines() {
+        return repository.getAllOrigines();
+    }
+
 
     public LiveData<List<Matrice>> getAllMatrices() {
         return repository.getAllMatrices();

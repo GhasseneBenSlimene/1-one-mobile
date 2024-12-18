@@ -30,7 +30,7 @@ public class EvaluationListByUtr extends AppCompatActivity {
 
     private void openAddDialog() {
         // Fonctionnalité à ajouter plus tard pour le bouton "Ajouter"
-        Intent intent = new Intent(EvaluationListByUtr.this, AddEvaluationByUtr.class);
+        Intent intent = new Intent(EvaluationListByUtr.this, EvaluationUtrForm.class);
         startActivity(intent);
     }
 }

@@ -1,32 +1,16 @@
 package com.example.one_mobile.ui;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.one_mobile.R;
-import com.example.one_mobile.data.network.ApiService;
-import com.example.one_mobile.data.network.RetrofitClient;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class AddEvaluationByUtr extends AppCompatActivity {
+public class EvaluationUtrForm extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_evaluation_by_utr);
+        setContentView(R.layout.evaluation_utr_form);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Ajouter une évaluation (Unité de travail)");
@@ -37,7 +21,6 @@ public class AddEvaluationByUtr extends AppCompatActivity {
 
 //package com.example.one_mobile.ui;
 //
-//import android.os.Bundle;
 //import android.view.View;
 //import android.widget.AdapterView;
 //import android.widget.ArrayAdapter;
@@ -46,9 +29,6 @@ public class AddEvaluationByUtr extends AppCompatActivity {
 //import android.widget.TextView;
 //import android.widget.Toast;
 //
-//import androidx.appcompat.app.AppCompatActivity;
-//
-//import com.example.one_mobile.R;
 //import com.example.one_mobile.data.network.ApiService;
 //import com.example.one_mobile.data.network.RetrofitClient;
 //import com.example.one_mobile.model.Situation;
@@ -60,7 +40,7 @@ public class AddEvaluationByUtr extends AppCompatActivity {
 //import retrofit2.Callback;
 //import retrofit2.Response;
 //
-//public class AddEvaluationByUtr extends AppCompatActivity {
+//public class EvaluationUtrForm extends AppCompatActivity {
 //    private Spinner situationSpinner;
 //    private LinearLayout informationLayout;
 //    private TextView codeText, risqueText, sousDomaineText, libelleText;
@@ -68,7 +48,7 @@ public class AddEvaluationByUtr extends AppCompatActivity {
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.add_evaluation_by_utr); // Updated layout file name
+//        setContentView(R.layout.evaluation_utr_form); // Updated layout file name
 //
 //        // Initialisation des vues
 //        situationSpinner = findViewById(R.id.situation_spinner);
@@ -95,7 +75,7 @@ public class AddEvaluationByUtr extends AppCompatActivity {
 //                    }
 //
 //                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-//                            AddEvaluationByUtr.this,
+//                            EvaluationUtrForm.this,
 //                            android.R.layout.simple_spinner_item,
 //                            situationNames
 //                    );
@@ -118,7 +98,7 @@ public class AddEvaluationByUtr extends AppCompatActivity {
 //
 //            @Override
 //            public void onFailure(Call<List<Situation>> call, Throwable t) {
-//                Toast.makeText(AddEvaluationByUtr.this, "Erreur lors du chargement des données", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(EvaluationUtrForm.this, "Erreur lors du chargement des données", Toast.LENGTH_SHORT).show();
 //            }
 //        });
 //    }

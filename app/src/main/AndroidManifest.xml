@@ -38,14 +38,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-       
 
+        <activity android:name=".ui.Home" />
         <activity android:name=".ui.EvaluationListByUtr" />
         <activity android:name=".ui.EvaluationListByPost" />
         <activity android:name=".ui.EvaluationListByAction" />
         <activity android:name=".ui.EvaluationListBySite" />
         <activity android:name=".ui.ActionPlansByUtr" />
-        <activity android:name=".ui.AddEvaluationByUtr" />
+        <activity android:name=".ui.EvaluationUtrForm" />
+        <activity android:name=".ui.EvaluationSiteForm" />
 
 
 

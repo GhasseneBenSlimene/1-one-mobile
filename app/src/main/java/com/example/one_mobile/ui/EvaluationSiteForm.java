@@ -15,66 +15,61 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.Matrice;
+import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EvaluationSiteFormActivity extends AppCompatActivity {
+public class EvaluationSiteForm extends AppCompatActivity {
 
     private EvaluationSiteViewModel viewModel;
 
     private Spinner siteSpinner;
+    private Spinner originSpinner;
     private Spinner matriceSpinner;
-    private EditText origineEditText;
-    private EditText indiceEditText;
-    private EditText indiceIntEditText;
     private EditText descriptionEditText;
     private Button submitButton;
 
     private Site selectedSite;
+    private Origine selectedOrigine;
     private Matrice selectedMatrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_evaluation_site_form);
+        setContentView(R.layout.evaluation_site_form);
 
         // Initialize the ViewModel
         viewModel = new ViewModelProvider(this).get(EvaluationSiteViewModel.class);
 
         // Bind UI elements
         siteSpinner = findViewById(R.id.site_spinner);
+        originSpinner = findViewById(R.id.origin_spinner);
         matriceSpinner = findViewById(R.id.matrice_spinner);
-        origineEditText = findViewById(R.id.origine_edit_text);
-        indiceEditText = findViewById(R.id.indice_edit_text);
-        indiceIntEditText = findViewById(R.id.indice_int_edit_text);
         descriptionEditText = findViewById(R.id.description_edit_text);
         submitButton = findViewById(R.id.submit_button);
 
+        // Load data for spinners
         loadSites();
+        loadOrigins();
         loadMatrices();
 
         // Handle submit button click
         submitButton.setOnClickListener(v -> {
-            String origine = origineEditText.getText().toString();
-            String indice = indiceEditText.getText().toString();
-            String indiceInt = indiceIntEditText.getText().toString();
             String description = descriptionEditText.getText().toString();
 
-            if (selectedSite == null || selectedMatrice == null || origine.isEmpty() || indice.isEmpty() || indiceInt.isEmpty()) {
+            if (selectedSite == null || selectedOrigine == null || selectedMatrice == null || description.isEmpty()) {
                 Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             EvaluationSite evaluationSite = new EvaluationSite();
             evaluationSite.setSite(selectedSite);
-            evaluationSite.setMatrice(selectedMatrice);
-            evaluationSite.setOrigine(origine);
-            evaluationSite.setIndice(Double.parseDouble(indice));
-            evaluationSite.setIndiceInt(Integer.parseInt(indiceInt));
-            evaluationSite.setDescription(description);
+            evaluationSite.getEvaluation().setOrigine(selectedOrigine.getLib());
+            evaluationSite.getEvaluation().setMatrice(selectedMatrice);
+            evaluationSite.getEvaluation().setDesc(description);
 
             viewModel.createEvaluationSite(evaluationSite);
             viewModel.getCreatedEvaluationSite().observe(this, createdSite -> {
@@ -108,6 +103,32 @@ public class EvaluationSiteFormActivity extends AppCompatActivity {
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
                         selectedSite = null;
+                    }
+                });
+            }
+        });
+    }
+
+    private void loadOrigins() {
+        viewModel.getAllOrigines().observe(this, origins -> {
+            if (origins != null && !origins.isEmpty()) {
+                List<String> originNames = new ArrayList<>();
+                for (Origine origin : origins) {
+                    originNames.add(origin.getLib() + " (ID: " + origin.getId() + ")");
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, originNames);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                originSpinner.setAdapter(adapter);
+
+                originSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        selectedOrigine = origins.get(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        selectedOrigine = null;
                     }
                 });
             }
