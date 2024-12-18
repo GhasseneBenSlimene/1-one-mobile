@@ -55,7 +55,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Matrice"
+            android:text="Select Matrix"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -64,6 +64,22 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:minHeight="48dp"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Dynamic Factors Container -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Factors"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:id="@+id/factors_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:padding="8dp"
             android:layout_marginBottom="16dp" />
 

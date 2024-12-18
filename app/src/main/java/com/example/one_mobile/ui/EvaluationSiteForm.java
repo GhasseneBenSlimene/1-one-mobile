@@ -6,6 +6,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -14,9 +15,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.model.EvaluationSite;
+import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
+import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Site;
+import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 
 import java.util.ArrayList;
@@ -26,15 +30,15 @@ public class EvaluationSiteForm extends AppCompatActivity {
 
     private EvaluationSiteViewModel viewModel;
 
-    private Spinner siteSpinner;
-    private Spinner originSpinner;
-    private Spinner matriceSpinner;
+    private Spinner siteSpinner, originSpinner, matriceSpinner;
     private EditText descriptionEditText;
     private Button submitButton;
+    private LinearLayout factorsContainer;
 
     private Site selectedSite;
     private Origine selectedOrigine;
     private Matrice selectedMatrice;
+    private List<MatriceFacteur> matriceFacteurs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +54,25 @@ public class EvaluationSiteForm extends AppCompatActivity {
         matriceSpinner = findViewById(R.id.matrice_spinner);
         descriptionEditText = findViewById(R.id.description_edit_text);
         submitButton = findViewById(R.id.submit_button);
+        factorsContainer = findViewById(R.id.factors_container);
 
         // Load data for spinners
         loadSites();
         loadOrigins();
         loadMatrices();
+
+        matriceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedMatrice = (Matrice) matriceSpinner.getSelectedItem();
+                loadFactors(selectedMatrice.getId());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                selectedMatrice = null;
+            }
+        });
 
         // Handle submit button click
         submitButton.setOnClickListener(v -> {
@@ -86,11 +104,7 @@ public class EvaluationSiteForm extends AppCompatActivity {
     private void loadSites() {
         viewModel.getAllSites().observe(this, sites -> {
             if (sites != null && !sites.isEmpty()) {
-                List<String> siteNames = new ArrayList<>();
-                for (Site site : sites) {
-                    siteNames.add(site.getLib() + " (ID: " + site.getId() + ")");
-                }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, siteNames);
+                ArrayAdapter<Site> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, sites);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 siteSpinner.setAdapter(adapter);
 
@@ -112,11 +126,7 @@ public class EvaluationSiteForm extends AppCompatActivity {
     private void loadOrigins() {
         viewModel.getAllOrigines().observe(this, origins -> {
             if (origins != null && !origins.isEmpty()) {
-                List<String> originNames = new ArrayList<>();
-                for (Origine origin : origins) {
-                    originNames.add(origin.getLib() + " (ID: " + origin.getId() + ")");
-                }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, originNames);
+                ArrayAdapter<Origine> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, origins);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 originSpinner.setAdapter(adapter);
 
@@ -138,25 +148,37 @@ public class EvaluationSiteForm extends AppCompatActivity {
     private void loadMatrices() {
         viewModel.getAllMatrices().observe(this, matrices -> {
             if (matrices != null && !matrices.isEmpty()) {
-                List<String> matriceNames = new ArrayList<>();
-                for (Matrice matrice : matrices) {
-                    matriceNames.add(matrice.getRegle() + " (ID: " + matrice.getId() + ")");
-                }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, matriceNames);
+                ArrayAdapter<Matrice> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, matrices);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 matriceSpinner.setAdapter(adapter);
+            }
+        });
+    }
 
-                matriceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        selectedMatrice = matrices.get(position);
-                    }
+    private void loadFactors(long matriceId) {
+        viewModel.getMatriceFacteursByMatriceId(matriceId).observe(this, factors -> {
+            if (factors != null && !factors.isEmpty()) {
+                matriceFacteurs = factors;
+                factorsContainer.removeAllViews();
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        selectedMatrice = null;
+                for (MatriceFacteur matriceFacteur : factors) {
+                    Facteur facteur = matriceFacteur.getFacteur();
+                    if (facteur.getType() == 0) { // Type libre
+                        EditText editText = new EditText(this);
+                        editText.setHint(facteur.getLib());
+                        factorsContainer.addView(editText);
+                    } else if (facteur.getType() == 1) { // Type liste
+                        Spinner spinner = new Spinner(this);
+                        viewModel.getValeursByFacteurId(facteur.getId()).observe(this, valeurs -> {
+                            if (valeurs != null && !valeurs.isEmpty()) {
+                                ArrayAdapter<Valeur> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, valeurs);
+                                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spinner.setAdapter(adapter);
+                            }
+                        });
+                        factorsContainer.addView(spinner);
                     }
-                });
+                }
             }
         });
     }

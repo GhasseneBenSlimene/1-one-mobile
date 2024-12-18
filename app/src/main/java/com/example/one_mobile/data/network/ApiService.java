@@ -64,10 +64,10 @@ public interface ApiService {
     Call<Matrice> getMatriceById(@Path("id") long matriceId);
 
     // Site
-    @GET("/Site/")
+    @GET("/site/")
     Call<List<Site>> getAllSites();
 
-    @GET("/Site/{id}")
+    @GET("/site/{id}")
     Call<Site> getSiteById(@Path("id") long siteId);
 
     @GET("/origine/")
@@ -83,7 +83,7 @@ public interface ApiService {
     @GET("/Facteur/{id}")
     Call<Facteur> getFacteurById(@Path("id") long facteurId);
 
-    @GET("/valeur/facteur/{id}")
+    @GET("/valeurByFacteur/{id}")
     Call<List<Valeur>> getValeursByFacteurId(@Path("id") long facteurId);
 
     // EvaluationValeur

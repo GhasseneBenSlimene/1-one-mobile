@@ -4,7 +4,7 @@ public class Facteur {
     private long id;
     private String code;
     private String lib;
-    private String type;
+    private float type;
 
     // Getters et Setters
     public long getId() {
@@ -31,11 +31,11 @@ public class Facteur {
         this.lib = lib;
     }
 
-    public String getType() {
+    public float getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(float type) {
         this.type = type;
     }
 }
