@@ -64,7 +64,7 @@ public interface ApiService {
     Call<Matrice> getMatriceById(@Path("id") long matriceId);
 
     // Site
-    @GET("/Site/")
+    @GET("/site/")
     Call<List<Site>> getAllSites();
 
     @GET("/Site/{id}")

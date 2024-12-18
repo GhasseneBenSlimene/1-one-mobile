@@ -12,6 +12,7 @@ public class Evaluation {
     private String descCourt;
     private boolean valide;
     private Date date;
+    private Risque risque;
 
     // Getters et Setters
     public long getId() {
@@ -84,5 +85,13 @@ public class Evaluation {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public Risque getRisque() {
+        return risque;
+    }
+
+    public void setRisque(Risque risque) {
+        this.risque = risque;
     }
 }
