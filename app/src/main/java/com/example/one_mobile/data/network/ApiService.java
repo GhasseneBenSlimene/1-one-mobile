@@ -77,7 +77,7 @@ public interface ApiService {
     Call<Origine> getOrigineById(@Path("id") long origineId);
 
     // Facteurs et Valeurs
-    @GET("/facteur/matrice/{id}")
+    @GET("/valeurByFacteur/{id}")
     Call<List<MatriceFacteur>> getMatriceFacteursByMatriceId(@Path("id") long matriceId);
 
     @GET("/Facteur/{id}")
