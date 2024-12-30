@@ -1,8 +1,19 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.Entity;
+import androidx.room.Embedded;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "evaluation_sites")
 public class EvaluationSite {
+
+    @PrimaryKey(autoGenerate = true)
     private long id;
+
+    @Embedded
     private Site site;
+
+    @Embedded(prefix = "evaluation_")
     private Evaluation evaluation;
 
     // Getters et Setters

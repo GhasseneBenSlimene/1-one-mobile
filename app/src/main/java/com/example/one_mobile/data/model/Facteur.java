@@ -1,5 +1,8 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.Entity;
+
+@Entity(tableName = "facteurs")
 public class Facteur {
     private long id;
     private String code;

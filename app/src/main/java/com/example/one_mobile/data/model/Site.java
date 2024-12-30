@@ -1,5 +1,8 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.Entity;
+
+@Entity(tableName = "sites")
 public class Site {
     private long id;
     private String lib;
