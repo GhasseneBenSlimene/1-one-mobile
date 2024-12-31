@@ -1,6 +1,11 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "risques")
 public class Risque {
+    @PrimaryKey
     private long id;
     private String code;
     private String lib;

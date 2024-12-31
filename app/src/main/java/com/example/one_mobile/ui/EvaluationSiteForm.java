@@ -8,14 +8,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
-import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
@@ -196,18 +193,18 @@ public class EvaluationSiteForm extends AppCompatActivity {
     }
 
     private void submitEvaluationSite() {
-        String description = descriptionEditText.getText().toString();
-
-        if (selectedSite == null || selectedOrigine == null || selectedMatrice == null || description.isEmpty()) {
-            Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        EvaluationSite evaluationSite = new EvaluationSite();
-        evaluationSite.setSite(selectedSite);
-        evaluationSite.getEvaluation().setOrigine(selectedOrigine.getLib());
-        evaluationSite.getEvaluation().setMatrice(selectedMatrice);
-        evaluationSite.getEvaluation().setDesc(description);
+//        String description = descriptionEditText.getText().toString();
+//
+//        if (selectedSite == null || selectedOrigine == null || selectedMatrice == null || description.isEmpty()) {
+//            Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        EvaluationSite evaluationSite = new EvaluationSite();
+//        evaluationSite.setSite(selectedSite);
+//        evaluationSite.getEvaluation().setOrigine(selectedOrigine);
+//        evaluationSite.getEvaluation().setMatrice(selectedMatrice);
+//        evaluationSite.getEvaluation().setDesc(description);
 
 //        viewModel.createEvaluationSite(evaluationSite).observe(this, createdSite -> {
 //            if (createdSite != null) {

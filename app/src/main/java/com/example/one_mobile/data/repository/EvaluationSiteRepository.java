@@ -3,12 +3,15 @@ package com.example.one_mobile.data.repository;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.one_mobile.data.local.AppDatabase;
 import com.example.one_mobile.data.local.EvaluationSiteDao;
+import com.example.one_mobile.data.local.MatriceDao;
+import com.example.one_mobile.data.local.OrigineDao;
 import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
@@ -29,14 +32,19 @@ import retrofit2.Response;
 
 public class EvaluationSiteRepository {
 
+
     private final ApiService apiService;
     private final EvaluationSiteDao evaluationSiteDao;
+    private final MatriceDao matriceDao;
+    private final OrigineDao origineDao;
     private final ExecutorService executor;
     private final Context context;
 
     public EvaluationSiteRepository(Context context) {
         apiService = RetrofitClient.getApiService();
         evaluationSiteDao = AppDatabase.getInstance(context).evaluationSiteDao();
+        matriceDao = AppDatabase.getInstance(context).matriceDao();
+        origineDao = AppDatabase.getInstance(context).origineDao();
         executor = Executors.newSingleThreadExecutor();
         this.context = context;
     }
@@ -186,6 +194,10 @@ public class EvaluationSiteRepository {
         MutableLiveData<List<EvaluationSite>> evaluationSitesLiveData = new MutableLiveData<>();
 
         if (isNetworkAvailable()) {
+            // First, update Matrices and Origines
+            updateMatricesAndOrigines();
+
+            // Then fetch EvaluationSites
             apiService.getAllEvaluationSites().enqueue(new Callback<List<EvaluationSite>>() {
                 @Override
                 public void onResponse(Call<List<EvaluationSite>> call, Response<List<EvaluationSite>> response) {
@@ -225,6 +237,51 @@ public class EvaluationSiteRepository {
             List<EvaluationSite> localEvaluationSites = evaluationSiteDao.getAllEvaluationSitesSync();
             evaluationSitesLiveData.postValue(localEvaluationSites);
         });
+    }
+
+    public void updateMatricesAndOrigines() {
+        if (isNetworkAvailable()) {
+            // Fetch matrices from the server
+            apiService.getAllMatrices().enqueue(new Callback<List<Matrice>>() {
+                @Override
+                public void onResponse(Call<List<Matrice>> call, Response<List<Matrice>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Matrice> matrices = response.body();
+                        executor.execute(() -> {
+                            matriceDao.clearAll(); // Clear the local Matrice table
+                            matriceDao.insertAll(matrices); // Insert the latest Matrices
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Matrice>> call, Throwable t) {
+                    // Handle failure (optional logging)
+                }
+            });
+
+            // Fetch origines from the server
+            apiService.getAllOrigines().enqueue(new Callback<List<Origine>>() {
+                @Override
+                public void onResponse(Call<List<Origine>> call, Response<List<Origine>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Origine> origines = response.body();
+                        executor.execute(() -> {
+                            origineDao.clearAll(); // Clear the local Origine table
+                            origineDao.insertAll(origines); // Insert the latest Origines
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Origine>> call, Throwable t) {
+                    // Handle failure (optional logging)
+                }
+            });
+        } else {
+            // Handle case when network is unavailable
+            Log.e("Repository", "Network unavailable. Cannot update Matrices and Origines.");
+        }
     }
 
     private boolean isNetworkAvailable() {

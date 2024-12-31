@@ -65,6 +65,10 @@ public class EvaluationSiteViewModel extends AndroidViewModel {
         });
     }
 
+    public void updateMatricesAndOrigines() {
+        repository.updateMatricesAndOrigines();
+    }
+
     public LiveData<EvaluationSite> getCreatedEvaluationSite() {
         return createdEvaluationSite;
     }

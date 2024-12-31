@@ -1,11 +1,16 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.Date;
 
+@Entity(tableName = "evaluations")
 public class Evaluation {
+    @PrimaryKey(autoGenerate = true)
     private long id;
-    private String origine;
-    private Matrice matrice;
+    private long origineId; // Foreign key reference to Origine
+    private long matriceId; // Foreign key reference to Matrice
     private float indice;
     private int indiceInt;
     private String desc;
@@ -14,7 +19,7 @@ public class Evaluation {
     private Date date;
     private Risque risque;
 
-    // Getters et Setters
+    // Getters and Setters
     public long getId() {
         return id;
     }
@@ -23,20 +28,20 @@ public class Evaluation {
         this.id = id;
     }
 
-    public String getOrigine() {
-        return origine;
+    public long getOrigineId() {
+        return origineId;
     }
 
-    public void setOrigine(String origine) {
-        this.origine = origine;
+    public void setOrigineId(long origineId) {
+        this.origineId = origineId;
     }
 
-    public Matrice getMatrice() {
-        return matrice;
+    public long getMatriceId() {
+        return matriceId;
     }
 
-    public void setMatrice(Matrice matrice) {
-        this.matrice = matrice;
+    public void setMatriceId(long matriceId) {
+        this.matriceId = matriceId;
     }
 
     public float getIndice() {

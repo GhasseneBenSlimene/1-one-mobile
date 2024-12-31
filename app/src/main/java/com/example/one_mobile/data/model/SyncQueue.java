@@ -1,4 +1,4 @@
-package com.example.one_mobile.data.local;
+package com.example.one_mobile.data.model;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

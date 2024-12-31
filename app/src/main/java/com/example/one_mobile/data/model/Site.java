@@ -1,9 +1,11 @@
 package com.example.one_mobile.data.model;
 
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 @Entity(tableName = "sites")
 public class Site {
+    @PrimaryKey
     private long id;
     private String lib;
     private String code; // Champ ajouté
