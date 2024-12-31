@@ -13,12 +13,16 @@ import java.util.List;
 @Dao
 public interface EvaluationSiteDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(EvaluationSite evaluationSite);
-
     @Query("SELECT * FROM evaluation_sites")
     LiveData<List<EvaluationSite>> getAllEvaluationSites();
 
+    @Query("SELECT * FROM evaluation_sites")
+    List<EvaluationSite> getAllEvaluationSitesSync();
+
     @Query("DELETE FROM evaluation_sites")
     void clearAll();
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(List<EvaluationSite> evaluationSites);
 }
+

@@ -24,7 +24,7 @@ public class EvaluationSiteViewModel extends AndroidViewModel {
 
     public EvaluationSiteViewModel(Application application) {
         super(application);
-        repository = new EvaluationSiteRepository();
+        repository = new EvaluationSiteRepository(application);
         allEvaluationSites = repository.getAllEvaluationSites();
         createdEvaluationSite = new MutableLiveData<>();
     }

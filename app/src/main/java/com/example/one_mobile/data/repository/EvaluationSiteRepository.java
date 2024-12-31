@@ -1,19 +1,27 @@
 package com.example.one_mobile.data.repository;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.one_mobile.data.local.AppDatabase;
+import com.example.one_mobile.data.local.EvaluationSiteDao;
 import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
-import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Origine;
+import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.network.ApiService;
 import com.example.one_mobile.data.network.RetrofitClient;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,9 +30,15 @@ import retrofit2.Response;
 public class EvaluationSiteRepository {
 
     private final ApiService apiService;
+    private final EvaluationSiteDao evaluationSiteDao;
+    private final ExecutorService executor;
+    private final Context context;
 
-    public EvaluationSiteRepository() {
+    public EvaluationSiteRepository(Context context) {
         apiService = RetrofitClient.getApiService();
+        evaluationSiteDao = AppDatabase.getInstance(context).evaluationSiteDao();
+        executor = Executors.newSingleThreadExecutor();
+        this.context = context;
     }
 
     //
@@ -168,27 +182,57 @@ public class EvaluationSiteRepository {
         return createdEvaluationSite;
     }
 
-    //
     public LiveData<List<EvaluationSite>> getAllEvaluationSites() {
-        MutableLiveData<List<EvaluationSite>> evaluationSites = new MutableLiveData<>();
-        apiService.getAllEvaluationSites().enqueue(new Callback<List<EvaluationSite>>() {
-            @Override
-            public void onResponse(Call<List<EvaluationSite>> call, Response<List<EvaluationSite>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    evaluationSites.setValue(response.body());
-                } else {
-                    evaluationSites.setValue(null);
-                }
-            }
+        MutableLiveData<List<EvaluationSite>> evaluationSitesLiveData = new MutableLiveData<>();
 
-            @Override
-            public void onFailure(Call<List<EvaluationSite>> call, Throwable t) {
-                evaluationSites.setValue(null);
-            }
-        });
-        return evaluationSites;
+        if (isNetworkAvailable()) {
+            apiService.getAllEvaluationSites().enqueue(new Callback<List<EvaluationSite>>() {
+                @Override
+                public void onResponse(Call<List<EvaluationSite>> call, Response<List<EvaluationSite>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<EvaluationSite> evaluationSites = response.body();
+
+                        // Update local database with the latest 40 records
+                        executor.execute(() -> {
+                            evaluationSiteDao.clearAll();
+                            evaluationSiteDao.insertAll(evaluationSites.subList(0, Math.min(40, evaluationSites.size())));
+                        });
+
+                        // Post the fetched data to LiveData
+                        evaluationSitesLiveData.postValue(evaluationSites);
+                    } else {
+                        // Fallback to local data if API fails
+                        loadLocalEvaluationSites(evaluationSitesLiveData);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<EvaluationSite>> call, Throwable t) {
+                    // Fallback to local data on failure
+                    loadLocalEvaluationSites(evaluationSitesLiveData);
+                }
+            });
+        } else {
+            // Load from local database if no network is available
+            loadLocalEvaluationSites(evaluationSitesLiveData);
+        }
+
+        return evaluationSitesLiveData;
     }
 
+    private void loadLocalEvaluationSites(MutableLiveData<List<EvaluationSite>> evaluationSitesLiveData) {
+        executor.execute(() -> {
+            List<EvaluationSite> localEvaluationSites = evaluationSiteDao.getAllEvaluationSitesSync();
+            evaluationSitesLiveData.postValue(localEvaluationSites);
+        });
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 }
 
 
