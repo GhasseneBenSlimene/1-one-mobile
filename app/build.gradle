@@ -44,6 +44,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
+    // Date
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
     implementation libs.appcompat
     implementation libs.material
     testImplementation libs.junit

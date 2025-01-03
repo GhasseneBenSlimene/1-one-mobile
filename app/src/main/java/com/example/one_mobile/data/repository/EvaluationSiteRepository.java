@@ -12,6 +12,7 @@ import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.network.ApiService;
 import com.example.one_mobile.data.network.RetrofitClient;
+import com.example.one_mobile.data.network.TokenManager;
 
 import java.util.List;
 
@@ -22,9 +23,11 @@ import retrofit2.Response;
 public class EvaluationSiteRepository {
 
     private final ApiService apiService;
+    private final TokenRefresherRepository tokenRefresherRepository;
 
     public EvaluationSiteRepository() {
         apiService = RetrofitClient.getApiService();
+        tokenRefresherRepository = new TokenRefresherRepository();
     }
 
     //
@@ -150,20 +153,38 @@ public class EvaluationSiteRepository {
 
     public LiveData<EvaluationSite> createEvaluationSite(EvaluationSite evaluationSite) {
         MutableLiveData<EvaluationSite> createdEvaluationSite = new MutableLiveData<>();
-        apiService.createEvaluationSite(evaluationSite).enqueue(new Callback<EvaluationSite>() {
+
+        tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
             @Override
-            public void onResponse(Call<EvaluationSite> call, Response<EvaluationSite> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    createdEvaluationSite.setValue(response.body());
-                } else {
-                    createdEvaluationSite.setValue(null);
-                }
+            public void onTokensRefreshed() {
+                String accessTokenCookie = "accessTokenCookie=" + TokenManager.getInstance().getAccessToken();
+                String xsrfTokenCookie = "XSRF-TOKEN=" + TokenManager.getInstance().getXsrfToken();
+                String cookies = xsrfTokenCookie + "; " + accessTokenCookie;
+                System.out.println("New access token: " + accessTokenCookie);
+                System.out.println("New xsrf token: " + xsrfTokenCookie);
+                apiService.createEvaluationSite(evaluationSite).enqueue(new Callback<EvaluationSite>() {
+                    @Override
+                    public void onResponse(Call<EvaluationSite> call, Response<EvaluationSite> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            createdEvaluationSite.setValue(response.body());
+                        } else {
+                            createdEvaluationSite.setValue(null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<EvaluationSite> call, Throwable t) {
+                        createdEvaluationSite.setValue(null);
+                        t.printStackTrace();
+                    }
+                });
             }
 
             @Override
-            public void onFailure(Call<EvaluationSite> call, Throwable t) {
+            public void onFailure() {
                 createdEvaluationSite.setValue(null);
             }
+
         });
         return createdEvaluationSite;
     }

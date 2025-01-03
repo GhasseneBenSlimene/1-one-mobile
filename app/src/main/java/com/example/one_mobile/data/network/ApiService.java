@@ -43,9 +43,14 @@ public interface ApiService {
     @GET("/auth/openSession")
     Call<Void> getSessionToken();
 
+    @GET("/auth/refresh")
+    Call<Void> refreshTokens(
+    );
+
+
     @POST("/auth")
     Call<AuthResponse> authenticate(
-            @Header("X-XSRF-TOKEN") String xsrfToken,
+//            @Header("X-XSRF-TOKEN") String xsrfToken,
             @Body AuthenticationRequest request
     );
 
@@ -54,7 +59,10 @@ public interface ApiService {
     Call<List<EvaluationSite>> getAllEvaluationSites();
 
     @POST("/evaluationSite/")
-    Call<EvaluationSite> createEvaluationSite(@Body EvaluationSite evaluationSite);
+    Call<EvaluationSite> createEvaluationSite(
+            @Body EvaluationSite evaluationSite
+    );
+
 
     // Matrice
     @GET("/Matrice/")
@@ -77,7 +85,7 @@ public interface ApiService {
     Call<Origine> getOrigineById(@Path("id") long origineId);
 
     // Facteurs et Valeurs
-    @GET("/valeurByFacteur/{id}")
+    @GET("/facteur/matrice/{id}")
     Call<List<MatriceFacteur>> getMatriceFacteursByMatriceId(@Path("id") long matriceId);
 
     @GET("/Facteur/{id}")

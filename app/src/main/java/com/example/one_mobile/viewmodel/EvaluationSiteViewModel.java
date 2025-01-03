@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.Facteur;
@@ -18,27 +19,27 @@ import com.example.one_mobile.data.repository.EvaluationSiteRepository;
 import java.util.List;
 
 public class EvaluationSiteViewModel extends AndroidViewModel {
-    private final EvaluationSiteRepository repository;
+    private final EvaluationSiteRepository evaluationSiteRepository;
     private final LiveData<List<EvaluationSite>> allEvaluationSites;
-    private MutableLiveData<EvaluationSite> createdEvaluationSite;
+    private final MutableLiveData<EvaluationSite> createdEvaluationSite;
 
     public EvaluationSiteViewModel(Application application) {
         super(application);
-        repository = new EvaluationSiteRepository();
-        allEvaluationSites = repository.getAllEvaluationSites();
+        evaluationSiteRepository = new EvaluationSiteRepository();
+        allEvaluationSites = evaluationSiteRepository.getAllEvaluationSites();
         createdEvaluationSite = new MutableLiveData<>();
     }
 
     public LiveData<List<Site>> getAllSites() {
-        return repository.getAllSites();
+        return evaluationSiteRepository.getAllSites();
     }
 
     public LiveData<List<Origine>> getAllOrigines() {
-        return repository.getAllOrigines();
+        return evaluationSiteRepository.getAllOrigines();
     }
 
     public LiveData<List<Matrice>> getAllMatrices() {
-        return repository.getAllMatrices();
+        return evaluationSiteRepository.getAllMatrices();
     }
 
     public LiveData<List<EvaluationSite>> getAllEvaluationSites() {
@@ -46,24 +47,28 @@ public class EvaluationSiteViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<MatriceFacteur>> getMatriceFacteursByMatriceId(long matriceId) {
-        return repository.getMatriceFacteursByMatriceId(matriceId);
+        return evaluationSiteRepository.getMatriceFacteursByMatriceId(matriceId);
     }
 
     public LiveData<List<Valeur>> getValeursByFacteurId(long facteurId) {
-        return repository.getValeursByFacteurId(facteurId);
+        return evaluationSiteRepository.getValeursByFacteurId(facteurId);
     }
 
     public LiveData<Facteur> getFacteurById(long facteurId) {
-        return repository.getFacteurById(facteurId);
+        return evaluationSiteRepository.getFacteurById(facteurId);
     }
 
-    public void createEvaluationSite(EvaluationSite evaluationSite) {
-        repository.createEvaluationSite(evaluationSite).observeForever(newEvaluationSite -> {
-            if (newEvaluationSite != null) {
-                createdEvaluationSite.setValue(newEvaluationSite);
+    public LiveData<EvaluationSite> createEvaluationSite(EvaluationSite evaluationSite) {
+        LiveData<EvaluationSite> result = evaluationSiteRepository.createEvaluationSite(evaluationSite);
+        result.observeForever(new Observer<EvaluationSite>() {
+            @Override
+            public void onChanged(EvaluationSite evaluationSite) {
+                createdEvaluationSite.setValue(evaluationSite);
             }
         });
+        return createdEvaluationSite;
     }
+
 
     public LiveData<EvaluationSite> getCreatedEvaluationSite() {
         return createdEvaluationSite;

@@ -11,22 +11,31 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.model.EvaluationSite;
+import com.example.one_mobile.data.model.Evaluation;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Origine;
+import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Date;
+import java.util.Locale;
+
 
 public class EvaluationSiteForm extends AppCompatActivity {
 
@@ -70,6 +79,8 @@ public class EvaluationSiteForm extends AppCompatActivity {
         viewModel.getAllSites().observe(this, sites -> {
             if (sites != null && !sites.isEmpty()) {
                 List<String> siteNames = new ArrayList<>();
+                siteNames.add(""); // Add placeholder
+
                 for (Site site : sites) {
                     siteNames.add(site.getLib() + " (ID: " + site.getId() + ")");
                 }
@@ -80,7 +91,11 @@ public class EvaluationSiteForm extends AppCompatActivity {
                 siteSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        selectedSite = sites.get(position);
+                        if (position == 0) { // First item selected
+                            selectedSite = null;
+                        } else {
+                            selectedSite = sites.get(position - 1); // Adjust index for placeholder
+                        }
                     }
 
                     @Override
@@ -96,6 +111,7 @@ public class EvaluationSiteForm extends AppCompatActivity {
         viewModel.getAllOrigines().observe(this, origins -> {
             if (origins != null && !origins.isEmpty()) {
                 List<String> originNames = new ArrayList<>();
+                originNames.add(""); // Add placeholder
                 for (Origine origin : origins) {
                     originNames.add(origin.getLib() + " (ID: " + origin.getId() + ")");
                 }
@@ -106,7 +122,11 @@ public class EvaluationSiteForm extends AppCompatActivity {
                 originSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        selectedOrigine = origins.get(position);
+                        if (position == 0) { // First item selected
+                            selectedOrigine = null;
+                        } else {
+                            selectedOrigine = origins.get(position - 1); // Adjust index for placeholder
+                        }
                     }
 
                     @Override
@@ -122,6 +142,7 @@ public class EvaluationSiteForm extends AppCompatActivity {
         viewModel.getAllMatrices().observe(this, matrices -> {
             if (matrices != null && !matrices.isEmpty()) {
                 List<String> matriceNames = new ArrayList<>();
+                matriceNames.add(""); // Add placeholder
                 for (Matrice matrice : matrices) {
                     matriceNames.add(matrice.getRegle() + " (ID: " + matrice.getId() + ")");
                 }
@@ -132,8 +153,13 @@ public class EvaluationSiteForm extends AppCompatActivity {
                 matriceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        selectedMatrice = matrices.get(position);
-                        loadFactorsForSelectedMatrix();
+                        if (position == 0) { // First item selected
+                            selectedMatrice = null;
+                            factorsContainer.removeAllViews();
+                        } else {
+                            selectedMatrice = matrices.get(position - 1); // Adjust index for placeholder
+                            loadFactorsForSelectedMatrix();
+                        }
                     }
 
                     @Override
@@ -203,19 +229,53 @@ public class EvaluationSiteForm extends AppCompatActivity {
             return;
         }
 
+        // Create EvaluationSite
         EvaluationSite evaluationSite = new EvaluationSite();
-        evaluationSite.setSite(selectedSite);
-        evaluationSite.getEvaluation().setOrigine(selectedOrigine.getLib());
-        evaluationSite.getEvaluation().setMatrice(selectedMatrice);
-        evaluationSite.getEvaluation().setDesc(description);
 
-//        viewModel.createEvaluationSite(evaluationSite).observe(this, createdSite -> {
-//            if (createdSite != null) {
-//                Toast.makeText(this, "EvaluationSite created successfully!", Toast.LENGTH_SHORT).show();
-//                finish();
-//            } else {
-//                Toast.makeText(this, "Failed to create EvaluationSite", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        // Ensure that the evaluation object is initialized
+        if (evaluationSite.getEvaluation() == null) {
+            evaluationSite.setEvaluation(new Evaluation()); // Manually initialize if it's null
+        }
+
+        // Populate the Evaluation object inside EvaluationSite
+        Evaluation evaluation = evaluationSite.getEvaluation();
+        evaluation.setOrigine(selectedOrigine);
+        evaluation.setMatrice(selectedMatrice);
+        evaluation.setDesc(description);
+        evaluation.setDescCourt(description);
+        evaluation.setIndiceInt(1);
+        evaluation.setIndice(1);
+
+        // Set Risque with ID 253
+        Risque risque = new Risque();
+        risque.setId(253);
+        evaluation.setRisque(risque);
+
+        // Format the date to ISO string with Locale.US
+        Date currentDate = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault());
+        String formattedDate = sdf.format(currentDate);
+        evaluation.setDate(formattedDate);
+
+        // Set the valid date to one year after the current date
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        calendar.add(Calendar.YEAR, 1);
+        String validDate = sdf.format(calendar.getTime());
+        evaluation.setValid(validDate);
+
+
+        // Set the EvaluationSite properties
+        evaluationSite.setSite(selectedSite);
+        evaluationSite.setEvaluation(evaluation);
+
+        viewModel.createEvaluationSite(evaluationSite).observe(this, createdEvaluationSite -> {
+            if (createdEvaluationSite != null) {
+                Toast.makeText(this, "EvaluationSite created successfully!", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "Failed to create EvaluationSite", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

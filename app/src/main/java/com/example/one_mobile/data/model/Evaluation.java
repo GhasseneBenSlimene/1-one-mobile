@@ -1,17 +1,15 @@
 package com.example.one_mobile.data.model;
 
-import java.util.Date;
-
 public class Evaluation {
     private long id;
-    private String origine;
+    private Origine origine;
     private Matrice matrice;
     private float indice;
     private int indiceInt;
     private String desc;
     private String descCourt;
-    private boolean valide;
-    private Date date;
+    private String valid;
+    private String date;
     private Risque risque;
 
     // Getters et Setters
@@ -23,11 +21,11 @@ public class Evaluation {
         this.id = id;
     }
 
-    public String getOrigine() {
+    public Origine getOrigine() {
         return origine;
     }
 
-    public void setOrigine(String origine) {
+    public void setOrigine(Origine origine) {
         this.origine = origine;
     }
 
@@ -71,19 +69,19 @@ public class Evaluation {
         this.descCourt = descCourt;
     }
 
-    public boolean isValide() {
-        return valide;
+    public String getValid() {
+        return valid;
     }
 
-    public void setValide(boolean valide) {
-        this.valide = valide;
+    public void setValid(String valid) {
+        this.valid = valid;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
