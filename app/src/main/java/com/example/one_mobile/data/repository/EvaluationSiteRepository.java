@@ -7,6 +7,7 @@ import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
+import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Valeur;
@@ -49,6 +50,26 @@ public class EvaluationSiteRepository {
             }
         });
         return sites;
+    }
+
+    public LiveData<List<Risque>> getAllRisques() {
+        MutableLiveData<List<Risque>> risques = new MutableLiveData<>();
+        apiService.getAllRisques().enqueue(new Callback<List<Risque>>() {
+            @Override
+            public void onResponse(Call<List<Risque>> call, Response<List<Risque>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    risques.setValue(response.body());
+                } else {
+                    risques.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Risque>> call, Throwable t) {
+                risques.setValue(null);
+            }
+        });
+        return risques;
     }
 
     public LiveData<List<Origine>> getAllOrigines() {

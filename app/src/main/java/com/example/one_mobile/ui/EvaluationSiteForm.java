@@ -1,5 +1,6 @@
 package com.example.one_mobile.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -42,6 +43,8 @@ public class EvaluationSiteForm extends AppCompatActivity {
     private EvaluationSiteViewModel viewModel;
 
     private Spinner siteSpinner;
+
+    private Spinner riskSpinner;
     private Spinner originSpinner;
     private Spinner matriceSpinner;
     private EditText descriptionEditText;
@@ -49,6 +52,8 @@ public class EvaluationSiteForm extends AppCompatActivity {
     private Button submitButton;
 
     private Site selectedSite;
+
+    private Risque selectedRisque;
     private Origine selectedOrigine;
     private Matrice selectedMatrice;
 
@@ -63,12 +68,14 @@ public class EvaluationSiteForm extends AppCompatActivity {
 
         siteSpinner = findViewById(R.id.site_spinner);
         originSpinner = findViewById(R.id.origin_spinner);
+        riskSpinner = findViewById(R.id.risk_spinner);
         matriceSpinner = findViewById(R.id.matrice_spinner);
         descriptionEditText = findViewById(R.id.description_edit_text);
         factorsContainer = findViewById(R.id.factors_container);
         submitButton = findViewById(R.id.submit_button);
 
         loadSites();
+        loadRisks();
         loadOrigins();
         loadMatrices();
 
@@ -101,6 +108,38 @@ public class EvaluationSiteForm extends AppCompatActivity {
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
                         selectedSite = null;
+                    }
+                });
+            }
+        });
+    }
+
+    private void loadRisks(){
+        viewModel.getAllRisques().observe(this, risques -> {
+            if (risques != null && !risques.isEmpty()) {
+                List<String> risqueNames = new ArrayList<>();
+                risqueNames.add(""); // Add placeholder
+
+                for (Risque risque : risques) {
+                    risqueNames.add(risque.getLib() + " (ID: " + risque.getId() + ")");
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, risqueNames);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                riskSpinner.setAdapter(adapter);
+
+                riskSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (position == 0) { // First item selected
+                            selectedRisque = null;
+                        } else {
+                            selectedRisque = risques.get(position - 1); // Adjust index for placeholder
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        selectedRisque = null;
                     }
                 });
             }
@@ -239,17 +278,13 @@ public class EvaluationSiteForm extends AppCompatActivity {
 
         // Populate the Evaluation object inside EvaluationSite
         Evaluation evaluation = evaluationSite.getEvaluation();
+        evaluation.setRisque(selectedRisque);
         evaluation.setOrigine(selectedOrigine);
         evaluation.setMatrice(selectedMatrice);
         evaluation.setDesc(description);
         evaluation.setDescCourt(description);
         evaluation.setIndiceInt(1);
         evaluation.setIndice(1);
-
-        // Set Risque with ID 253
-        Risque risque = new Risque();
-        risque.setId(253);
-        evaluation.setRisque(risque);
 
         // Format the date to ISO string with Locale.US
         Date currentDate = new Date();
@@ -272,6 +307,9 @@ public class EvaluationSiteForm extends AppCompatActivity {
         viewModel.createEvaluationSite(evaluationSite).observe(this, createdEvaluationSite -> {
             if (createdEvaluationSite != null) {
                 Toast.makeText(this, "EvaluationSite created successfully!", Toast.LENGTH_SHORT).show();
+                // Redirect to EvaluationListBySite activity
+                Intent intent = new Intent(EvaluationSiteForm.this, EvaluationListBySite.class);
+                startActivity(intent);
                 finish();
             } else {
                 Toast.makeText(this, "Failed to create EvaluationSite", Toast.LENGTH_SHORT).show();

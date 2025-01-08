@@ -11,6 +11,7 @@ import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
+import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Valeur;
@@ -33,6 +34,11 @@ public class EvaluationSiteViewModel extends AndroidViewModel {
     public LiveData<List<Site>> getAllSites() {
         return evaluationSiteRepository.getAllSites();
     }
+
+    public LiveData<List<Risque>> getAllRisques() {
+        return evaluationSiteRepository.getAllRisques();
+    }
+
 
     public LiveData<List<Origine>> getAllOrigines() {
         return evaluationSiteRepository.getAllOrigines();

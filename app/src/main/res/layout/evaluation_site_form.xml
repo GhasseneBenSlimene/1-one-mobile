@@ -35,6 +35,22 @@
             android:padding="8dp"
             android:layout_marginBottom="16dp" />
 
+        <!-- Select Risk -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Risk"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/risk_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:minHeight="48dp"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp" />
+
         <!-- Select Origin -->
         <TextView
             android:layout_width="match_parent"

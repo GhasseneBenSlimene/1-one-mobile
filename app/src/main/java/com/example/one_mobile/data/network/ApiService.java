@@ -8,6 +8,7 @@ import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.model.EvaluationValeur;
+import com.example.one_mobile.data.model.Risque;
 
 
 import retrofit2.Call;
@@ -77,6 +78,12 @@ public interface ApiService {
 
     @GET("/site/{id}")
     Call<Site> getSiteById(@Path("id") long siteId);
+
+    @GET("/risque/")
+    Call<List<Risque>> getAllRisques();
+
+    @GET("/risque/{id}")
+    Call<Risque> getRisqueById(@Path("id") long risqueId);
 
     @GET("/origine/")
     Call<List<Origine>> getAllOrigines();
