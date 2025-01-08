@@ -30,78 +30,11 @@
         android:padding="8dp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Scroll pour la table -->
-    <ScrollView
+    <!-- RecyclerView pour afficher les données dynamiques -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_evaluation_risque"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TableLayout
-                android:id="@+id/table_evaluation_risque"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:stretchColumns="*" >
-
-                <!-- Ligne d'en-tête -->
-                <TableRow
-                    android:background="#3F51B5"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="N°"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:padding="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Site"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:padding="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Risque"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:padding="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Description"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:padding="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Validité"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:padding="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Action"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:padding="4dp" />
-                </TableRow>
-            </TableLayout>
-
-        </HorizontalScrollView>
-    </ScrollView>
+        android:scrollbars="vertical" />
 
 </LinearLayout>
