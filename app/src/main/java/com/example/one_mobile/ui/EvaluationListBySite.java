@@ -56,9 +56,9 @@ public class EvaluationListBySite extends AppCompatActivity {
         for (EvaluationSiteWithDetails evaluationSite : evaluationSites) {
             TableRow row = new TableRow(this);
 
-//            TextView idTextView = new TextView(this);
-//            idTextView.setText(String.valueOf(evaluationSite.getId()));
-//            row.addView(idTextView);
+            TextView idTextView = new TextView(this);
+            idTextView.setText(String.valueOf(evaluationSite.getEvaluation().getId()));
+            row.addView(idTextView);
 
             TextView siteTextView = new TextView(this);
             siteTextView.setText(evaluationSite.getSite().getLib());

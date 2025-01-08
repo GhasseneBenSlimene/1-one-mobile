@@ -75,4 +75,12 @@ public class Matrice {
     public void setEntityName(String entityName) {
         this.entityName = entityName;
     }
+
+    @Override
+    public String toString() {
+        return "Matrice{" +
+                "id=" + id +
+                ", regle='" + regle + '\'' +
+                '}';
+    }
 }

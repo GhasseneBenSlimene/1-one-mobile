@@ -278,13 +278,27 @@ public class EvaluationSiteRepository {
                                 Log.e("EvaluationSiteRepository", "Error processing DTO: " + dto, e);
                             }
                         }
-
                         Log.d("EvaluationSiteRepository", "Finished processing DTOs:");
                         Log.d("EvaluationSiteRepository", "Matrices size: " + matrices.size());
+                        for (Matrice matrice : matrices) {
+                            Log.d("EvaluationSiteRepository", "Matrice: " + matrice.toString());
+                        }
                         Log.d("EvaluationSiteRepository", "Origines size: " + origines.size());
+                        for (Origine origine : origines) {
+                            Log.d("EvaluationSiteRepository", "Origine: " + origine.toString());
+                        }
                         Log.d("EvaluationSiteRepository", "Sites size: " + sites.size());
+                        for (Site site : sites) {
+                            Log.d("EvaluationSiteRepository", "Site: " + site.toString());
+                        }
                         Log.d("EvaluationSiteRepository", "Evaluations size: " + evaluations.size());
+                        for (Evaluation evaluation : evaluations) {
+                            Log.d("EvaluationSiteRepository", "Evaluation: " + evaluation.toString());
+                        }
                         Log.d("EvaluationSiteRepository", "EvaluationSites size: " + evaluationSites.size());
+                        for (EvaluationSite evaluationSite : evaluationSites) {
+                            Log.d("EvaluationSiteRepository", "EvaluationSite: " + evaluationSite.toString());
+                        }
 
                         // Save data to the local database
                         executor.execute(() -> {
@@ -330,7 +344,6 @@ public class EvaluationSiteRepository {
 
         return liveData;
     }
-
 
     private void loadLocalData(MutableLiveData<List<EvaluationSiteWithDetails>> liveData) {
         executor.execute(() -> {

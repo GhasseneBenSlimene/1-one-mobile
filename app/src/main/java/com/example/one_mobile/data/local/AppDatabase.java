@@ -25,7 +25,7 @@ import com.example.one_mobile.data.model.Site;
         Site.class,
         Origine.class,
         Evaluation.class,
-}, version = 2, exportSchema = false)
+}, version = 3, exportSchema = false)
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase instance;

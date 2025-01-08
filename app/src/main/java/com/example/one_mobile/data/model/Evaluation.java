@@ -20,8 +20,8 @@ public class Evaluation {
     @PrimaryKey
     private long id;
 
-    @ColumnInfo(name = "origine_id")
-    private long origineId;
+    @ColumnInfo(name = "origine_id", defaultValue = "NULL")
+    private Long origineId; // Use Long instead of long to allow null values
 
     @ColumnInfo(name = "matrice_id")
     private long matriceId;
@@ -32,9 +32,8 @@ public class Evaluation {
     private String descCourt;
     private boolean valide;
     private Date date;
-//    private Risque risque;
 
-    // Getters et Setters
+    // Getters and Setters
     public long getId() {
         return id;
     }
@@ -43,11 +42,11 @@ public class Evaluation {
         this.id = id;
     }
 
-    public long getOrigineId() {
+    public Long getOrigineId() {
         return origineId;
     }
 
-    public void setOrigineId(long origineId) {
+    public void setOrigineId(Long origineId) {
         this.origineId = origineId;
     }
 
@@ -107,11 +106,18 @@ public class Evaluation {
         this.date = date;
     }
 
-//    public Risque getRisque() {
-//        return risque;
-//    }
-//
-//    public void setRisque(Risque risque) {
-//        this.risque = risque;
-//    }
+    @Override
+    public String toString() {
+        return "Evaluation{" +
+                "id=" + id +
+                ", origineId=" + origineId +
+                ", matriceId=" + matriceId +
+                ", indice=" + indice +
+                ", indiceInt=" + indiceInt +
+                ", desc='" + desc + '\'' +
+                ", descCourt='" + descCourt + '\'' +
+                ", valide=" + valide +
+                ", date=" + date +
+                '}';
+    }
 }

@@ -34,4 +34,12 @@ public class Origine {
     public void setCode(String code) {
         this.code = code;
     }
+
+    @Override
+    public String toString() {
+        return "Matrice{" +
+                "id=" + id +
+                ", lib='" + lib + '\'' +
+                '}';
+    }
 }

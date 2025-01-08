@@ -48,4 +48,12 @@ public class EvaluationSite {
     public void setEvaluationId(long evaluationId) {
         this.evaluationId = evaluationId;
     }
+    @Override
+    public String toString() {
+        return "EvaluationSite{" +
+                "id=" + id +
+                ", siteId=" + siteId +
+                ", evaluationId=" + evaluationId +
+                '}';
+    }
 }

@@ -43,4 +43,12 @@ public class Site {
     public void setEffectif(long effectif) {
         this.effectif = effectif;
     }
+
+    @Override
+    public String toString() {
+        return "Matrice{" +
+                "id=" + id +
+                ", lib='" + lib + '\'' +
+                '}';
+    }
 }

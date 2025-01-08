@@ -93,12 +93,8 @@ public class EvaluationDTO {
     public Evaluation toEvaluation() {
         Evaluation evaluation = new Evaluation();
         evaluation.setId(this.getId());
-        if (this.getOrigine() != null) {
-            evaluation.setOrigineId(this.getOrigine().getId());
-        }
-        if (this.getMatrice() != null) {
-            evaluation.setMatriceId(this.getMatrice().getId());
-        }
+        evaluation.setOrigineId(this.getOrigine() != null ? this.getOrigine().getId() : null);
+        evaluation.setMatriceId(this.getMatrice() != null ? this.getMatrice().getId() : 0);
         evaluation.setIndice(this.getIndice());
         evaluation.setIndiceInt(this.getIndiceInt());
         evaluation.setDesc(this.getDesc());
