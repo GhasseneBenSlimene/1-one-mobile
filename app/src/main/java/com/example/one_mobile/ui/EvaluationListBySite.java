@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
+import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
 
 import java.util.List;
 
@@ -27,18 +28,19 @@ public class EvaluationListBySite extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.evaluation_list_by_site);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Évaluation du risque par Site");
-        }
-
         tableLayout = findViewById(R.id.table_evaluation_risque);
         Button buttonAjouter = findViewById(R.id.button_ajouter);
 
         buttonAjouter.setOnClickListener(v -> openAddDialog());
 
-        viewModel = new ViewModelProvider(this).get(EvaluationSiteViewModel.class);
+        // Créer une instance de ViewModel avec le factory
+        EvaluationSiteViewModelFactory factory = new EvaluationSiteViewModelFactory(this);
+        viewModel = new ViewModelProvider(this, factory).get(EvaluationSiteViewModel.class);
+
+        // Observer les données
         viewModel.getAllEvaluationSites().observe(this, this::populateTable);
     }
+
 
     private void openAddDialog() {
         Intent intent = new Intent(EvaluationListBySite.this, EvaluationSiteForm.class);

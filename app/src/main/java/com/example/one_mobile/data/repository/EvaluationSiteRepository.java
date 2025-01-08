@@ -259,43 +259,72 @@ public class EvaluationSiteRepository {
                         List<Site> sites = new ArrayList<>();
                         List<Evaluation> evaluations = new ArrayList<>();
 
+                        Log.d("EvaluationSiteRepository", "API response received, processing DTOs...");
+
                         for (EvaluationSiteWithDetailsDTO dto : dtoList) {
-                            // Map DTO to model and add to respective lists
-                            evaluationSites.add(dto.toEvaluationSite());
-                            evaluations.add(dto.getEvaluation().toEvaluation());
-                            matrices.add(dto.getEvaluation().getMatrice());
-                            if (dto.getEvaluation().getOrigine() != null) {
-                                origines.add(dto.getEvaluation().getOrigine());
+                            try {
+                                // Log raw DTO data
+                                Log.d("EvaluationSiteRepository", "Processing DTO: " + dto);
+
+                                // Map DTO to model and add to respective lists
+                                evaluationSites.add(dto.toEvaluationSite());
+                                evaluations.add(dto.getEvaluation().toEvaluation());
+                                matrices.add(dto.getEvaluation().getMatrice());
+                                if (dto.getEvaluation().getOrigine() != null) {
+                                    origines.add(dto.getEvaluation().getOrigine());
+                                }
+                                sites.add(dto.getSite());
+                            } catch (Exception e) {
+                                Log.e("EvaluationSiteRepository", "Error processing DTO: " + dto, e);
                             }
-                            sites.add(dto.getSite());
                         }
+
+                        Log.d("EvaluationSiteRepository", "Finished processing DTOs:");
+                        Log.d("EvaluationSiteRepository", "Matrices size: " + matrices.size());
+                        Log.d("EvaluationSiteRepository", "Origines size: " + origines.size());
+                        Log.d("EvaluationSiteRepository", "Sites size: " + sites.size());
+                        Log.d("EvaluationSiteRepository", "Evaluations size: " + evaluations.size());
+                        Log.d("EvaluationSiteRepository", "EvaluationSites size: " + evaluationSites.size());
 
                         // Save data to the local database
                         executor.execute(() -> {
-                            database.matriceDao().insertAll(matrices);
-                            database.origineDao().insertAll(origines);
-                            database.siteDao().insertAll(sites);
-                            database.evaluationDao().insertAll(evaluations);
-                            database.evaluationSiteDao().insertAll(evaluationSites);
+                            try {
+                                Log.d("EvaluationSiteRepository", "Inserting data into local database...");
+
+                                database.matriceDao().insertAll(matrices);
+                                database.origineDao().insertAll(origines);
+                                database.siteDao().insertAll(sites);
+                                database.evaluationDao().insertAll(evaluations);
+                                database.evaluationSiteDao().insertAll(evaluationSites);
+
+                                Log.d("EvaluationSiteRepository", "Data successfully inserted into local database.");
+                            } catch (Exception e) {
+                                Log.e("EvaluationSiteRepository", "Error inserting data into local database", e);
+                            }
 
                             // Load updated data from local database
-                            List<EvaluationSiteWithDetails> details = database.evaluationSiteDao().getAllEvaluationSitesWithDetailsSync();
-                            liveData.postValue(details);
+                            try {
+                                List<EvaluationSiteWithDetails> details = database.evaluationSiteDao().getAllEvaluationSitesWithDetailsSync();
+                                Log.d("EvaluationSiteRepository", "Loaded details from local database: " + details);
+                                liveData.postValue(details);
+                            } catch (Exception e) {
+                                Log.e("EvaluationSiteRepository", "Error loading details from local database", e);
+                            }
                         });
                     } else {
-                        // Fallback to local data if API call fails
+                        Log.e("EvaluationSiteRepository", "API response unsuccessful or body is null.");
                         loadLocalData(liveData);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<List<EvaluationSiteWithDetailsDTO>> call, Throwable t) {
-                    // Fallback to local data on failure
+                    Log.e("EvaluationSiteRepository", "API call failed", t);
                     loadLocalData(liveData);
                 }
             });
         } else {
-            // Load from local database if no network is available
+            Log.d("EvaluationSiteRepository", "No network available, loading from local database...");
             loadLocalData(liveData);
         }
 
