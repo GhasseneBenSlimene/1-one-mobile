@@ -1,4 +1,4 @@
-package com.example.one_mobile.data.local;
+package com.example.one_mobile.data.local.Dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;

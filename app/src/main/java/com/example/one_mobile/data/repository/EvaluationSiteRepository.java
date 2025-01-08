@@ -9,10 +9,14 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.one_mobile.data.local.AppDatabase;
-import com.example.one_mobile.data.local.EvaluationSiteDao;
-import com.example.one_mobile.data.local.MatriceDao;
-import com.example.one_mobile.data.local.OrigineDao;
+import com.example.one_mobile.data.local.Dao.EvaluationSiteDao;
+import com.example.one_mobile.data.local.Dao.MatriceDao;
+import com.example.one_mobile.data.local.Dao.OrigineDao;
+import com.example.one_mobile.data.local.Dao.SiteDao;
+import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
+import com.example.one_mobile.data.model.Evaluation;
 import com.example.one_mobile.data.model.EvaluationSite;
+import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
@@ -22,6 +26,7 @@ import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.network.ApiService;
 import com.example.one_mobile.data.network.RetrofitClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,15 +42,19 @@ public class EvaluationSiteRepository {
     private final EvaluationSiteDao evaluationSiteDao;
     private final MatriceDao matriceDao;
     private final OrigineDao origineDao;
+    private final SiteDao siteDao;
     private final ExecutorService executor;
     private final Context context;
+    private final AppDatabase database;
 
     public EvaluationSiteRepository(Context context) {
         apiService = RetrofitClient.getApiService();
         evaluationSiteDao = AppDatabase.getInstance(context).evaluationSiteDao();
         matriceDao = AppDatabase.getInstance(context).matriceDao();
         origineDao = AppDatabase.getInstance(context).origineDao();
+        siteDao = AppDatabase.getInstance(context).siteDao();
         executor = Executors.newSingleThreadExecutor();
+        this.database = AppDatabase.getInstance(context);
         this.context = context;
     }
 
@@ -190,55 +199,6 @@ public class EvaluationSiteRepository {
         return createdEvaluationSite;
     }
 
-    public LiveData<List<EvaluationSite>> getAllEvaluationSites() {
-        MutableLiveData<List<EvaluationSite>> evaluationSitesLiveData = new MutableLiveData<>();
-
-        if (isNetworkAvailable()) {
-            // First, update Matrices and Origines
-            updateMatricesAndOrigines();
-
-            // Then fetch EvaluationSites
-            apiService.getAllEvaluationSites().enqueue(new Callback<List<EvaluationSite>>() {
-                @Override
-                public void onResponse(Call<List<EvaluationSite>> call, Response<List<EvaluationSite>> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        List<EvaluationSite> evaluationSites = response.body();
-
-                        // Update local database with the latest 40 records
-                        executor.execute(() -> {
-                            evaluationSiteDao.clearAll();
-                            evaluationSiteDao.insertAll(evaluationSites.subList(0, Math.min(40, evaluationSites.size())));
-                        });
-
-                        // Post the fetched data to LiveData
-                        evaluationSitesLiveData.postValue(evaluationSites);
-                    } else {
-                        // Fallback to local data if API fails
-                        loadLocalEvaluationSites(evaluationSitesLiveData);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<EvaluationSite>> call, Throwable t) {
-                    // Fallback to local data on failure
-                    loadLocalEvaluationSites(evaluationSitesLiveData);
-                }
-            });
-        } else {
-            // Load from local database if no network is available
-            loadLocalEvaluationSites(evaluationSitesLiveData);
-        }
-
-        return evaluationSitesLiveData;
-    }
-
-    private void loadLocalEvaluationSites(MutableLiveData<List<EvaluationSite>> evaluationSitesLiveData) {
-        executor.execute(() -> {
-            List<EvaluationSite> localEvaluationSites = evaluationSiteDao.getAllEvaluationSitesSync();
-            evaluationSitesLiveData.postValue(localEvaluationSites);
-        });
-    }
-
     public void updateMatricesAndOrigines() {
         if (isNetworkAvailable()) {
             // Fetch matrices from the server
@@ -282,6 +242,72 @@ public class EvaluationSiteRepository {
             // Handle case when network is unavailable
             Log.e("Repository", "Network unavailable. Cannot update Matrices and Origines.");
         }
+    }
+
+    public LiveData<List<EvaluationSiteWithDetails>> getAllEvaluationSites() {
+        MutableLiveData<List<EvaluationSiteWithDetails>> liveData = new MutableLiveData<>();
+
+        if (isNetworkAvailable()) {
+            apiService.getAllEvaluationSites().enqueue(new Callback<List<EvaluationSiteWithDetailsDTO>>() {
+                @Override
+                public void onResponse(Call<List<EvaluationSiteWithDetailsDTO>> call, Response<List<EvaluationSiteWithDetailsDTO>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<EvaluationSiteWithDetailsDTO> dtoList = response.body();
+                        List<EvaluationSite> evaluationSites = new ArrayList<>();
+                        List<Matrice> matrices = new ArrayList<>();
+                        List<Origine> origines = new ArrayList<>();
+                        List<Site> sites = new ArrayList<>();
+                        List<Evaluation> evaluations = new ArrayList<>();
+
+                        for (EvaluationSiteWithDetailsDTO dto : dtoList) {
+                            // Map DTO to model and add to respective lists
+                            evaluationSites.add(dto.toEvaluationSite());
+                            evaluations.add(dto.getEvaluation().toEvaluation());
+                            matrices.add(dto.getEvaluation().getMatrice());
+                            if (dto.getEvaluation().getOrigine() != null) {
+                                origines.add(dto.getEvaluation().getOrigine());
+                            }
+                            sites.add(dto.getSite());
+                        }
+
+                        // Save data to the local database
+                        executor.execute(() -> {
+                            database.matriceDao().insertAll(matrices);
+                            database.origineDao().insertAll(origines);
+                            database.siteDao().insertAll(sites);
+                            database.evaluationDao().insertAll(evaluations);
+                            database.evaluationSiteDao().insertAll(evaluationSites);
+
+                            // Load updated data from local database
+                            List<EvaluationSiteWithDetails> details = database.evaluationSiteDao().getAllEvaluationSitesWithDetailsSync();
+                            liveData.postValue(details);
+                        });
+                    } else {
+                        // Fallback to local data if API call fails
+                        loadLocalData(liveData);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<EvaluationSiteWithDetailsDTO>> call, Throwable t) {
+                    // Fallback to local data on failure
+                    loadLocalData(liveData);
+                }
+            });
+        } else {
+            // Load from local database if no network is available
+            loadLocalData(liveData);
+        }
+
+        return liveData;
+    }
+
+
+    private void loadLocalData(MutableLiveData<List<EvaluationSiteWithDetails>> liveData) {
+        executor.execute(() -> {
+            List<EvaluationSiteWithDetails> localData = database.evaluationSiteDao().getAllEvaluationSitesWithDetailsSync();
+            liveData.postValue(localData);
+        });
     }
 
     private boolean isNetworkAvailable() {

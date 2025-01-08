@@ -8,7 +8,7 @@ public class Site {
     @PrimaryKey
     private long id;
     private String lib;
-    private String code; // Champ ajouté
+    private String code;
     private long effectif;
 
     // Getters et Setters

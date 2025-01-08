@@ -1,4 +1,4 @@
-package com.example.one_mobile.data.local;
+package com.example.one_mobile.data.local.Dao;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -12,11 +12,17 @@ import java.util.List;
 @Dao
 public interface EvaluationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertEvaluation(Evaluation evaluation);
+    void insert(Evaluation evaluation);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(List<Evaluation> evaluations);
 
     @Query("SELECT * FROM evaluations WHERE id = :id")
     Evaluation getEvaluationById(long id);
 
     @Query("SELECT * FROM evaluations")
     List<Evaluation> getAllEvaluations();
+
+    @Query("DELETE FROM evaluations")
+    void clearAll();
 }

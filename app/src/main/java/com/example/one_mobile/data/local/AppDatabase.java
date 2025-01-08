@@ -7,26 +7,29 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import com.example.one_mobile.data.local.Dao.EvaluationDao;
+import com.example.one_mobile.data.local.Dao.EvaluationSiteDao;
+import com.example.one_mobile.data.local.Dao.MatriceDao;
+import com.example.one_mobile.data.local.Dao.OrigineDao;
+import com.example.one_mobile.data.local.Dao.SiteDao;
+import com.example.one_mobile.data.model.Evaluation;
 import com.example.one_mobile.data.model.EvaluationSite;
-import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
-import com.example.one_mobile.data.model.MatriceFacteur;
-import com.example.one_mobile.data.model.RiskEvaluation;
+import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Site;
-import com.example.one_mobile.data.model.SyncQueue;
-import com.example.one_mobile.data.model.Valeur;
-
 @Database(entities = {
-        RiskEvaluation.class,
-        SyncQueue.class,
+//        RiskEvaluation.class,
+//        SyncQueue.class,
         EvaluationSite.class,
         Matrice.class,
-        MatriceFacteur.class,
+//        MatriceFacteur.class,
         Site.class,
-        Facteur.class,
-        Valeur.class,
-        RiskEvaluationDao.class,
-        SyncQueueDao.class,
+        Origine.class,
+        Evaluation.class,
+//        Facteur.class,
+//        Valeur.class,
+//        RiskEvaluationDao.class,
+//        SyncQueueDao.class,
 }, version = 1, exportSchema = false)
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
@@ -35,9 +38,10 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract EvaluationDao evaluationDao();
     public abstract MatriceDao matriceDao();
     public abstract OrigineDao origineDao();
+    public abstract SiteDao siteDao();
     public abstract EvaluationSiteDao evaluationSiteDao();
-    public abstract RiskEvaluationDao riskEvaluationDao();
-    public abstract SyncQueueDao syncQueueDao();
+//    public abstract RiskEvaluationDao riskEvaluationDao();
+//    public abstract SyncQueueDao syncQueueDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {

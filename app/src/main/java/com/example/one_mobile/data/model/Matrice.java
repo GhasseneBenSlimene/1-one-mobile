@@ -1,5 +1,6 @@
 package com.example.one_mobile.data.model;
 
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -10,11 +11,13 @@ public class Matrice {
     private String code;
     private String lib;
     private String regle;
-    private boolean stage;
-    private boolean calcIndice;
+    @Nullable
+    private Boolean stage;
+    @Nullable
+    private Boolean calcIndice;
     private String entityName;
 
-    // Getters et Setters
+    // Getters and Setters
     public long getId() {
         return id;
     }
@@ -47,19 +50,21 @@ public class Matrice {
         this.regle = regle;
     }
 
-    public boolean isStage() {
+    @Nullable
+    public Boolean getStage() {
         return stage;
     }
 
-    public void setStage(boolean stage) {
+    public void setStage(@Nullable Boolean stage) {
         this.stage = stage;
     }
 
-    public boolean isCalcIndice() {
+    @Nullable
+    public Boolean getCalcIndice() {
         return calcIndice;
     }
 
-    public void setCalcIndice(boolean calcIndice) {
+    public void setCalcIndice(@Nullable Boolean calcIndice) {
         this.calcIndice = calcIndice;
     }
 

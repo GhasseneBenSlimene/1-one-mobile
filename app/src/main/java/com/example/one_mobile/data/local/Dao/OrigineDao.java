@@ -1,4 +1,4 @@
-package com.example.one_mobile.data.local;
+package com.example.one_mobile.data.local.Dao;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -12,7 +12,7 @@ import java.util.List;
 @Dao
 public interface OrigineDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertOrigine(Origine origine);
+    void insert(Origine origine);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<Origine> origines);

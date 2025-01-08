@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
-import com.example.one_mobile.data.model.EvaluationSite;
+import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 
 import java.util.List;
@@ -45,26 +45,26 @@ public class EvaluationListBySite extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void populateTable(List<EvaluationSite> evaluationSites) {
+    private void populateTable(List<EvaluationSiteWithDetails> evaluationSites) {
         if (evaluationSites == null || evaluationSites.isEmpty()) {
             Toast.makeText(this, "Aucune évaluation trouvée", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        for (EvaluationSite evaluationSite : evaluationSites) {
+        for (EvaluationSiteWithDetails evaluationSite : evaluationSites) {
             TableRow row = new TableRow(this);
 
-            TextView idTextView = new TextView(this);
-            idTextView.setText(String.valueOf(evaluationSite.getId()));
-            row.addView(idTextView);
+//            TextView idTextView = new TextView(this);
+//            idTextView.setText(String.valueOf(evaluationSite.getId()));
+//            row.addView(idTextView);
 
             TextView siteTextView = new TextView(this);
             siteTextView.setText(evaluationSite.getSite().getLib());
             row.addView(siteTextView);
 
-            TextView risqueTextView = new TextView(this);
-            risqueTextView.setText(evaluationSite.getEvaluation().getRisque().getLib());
-            row.addView(risqueTextView);
+//            TextView risqueTextView = new TextView(this);
+//            risqueTextView.setText(evaluationSite.getEvaluation().getRisque().getLib());
+//            row.addView(risqueTextView);
 
             TextView descTextView = new TextView(this);
             descTextView.setText(evaluationSite.getEvaluation().getDesc());

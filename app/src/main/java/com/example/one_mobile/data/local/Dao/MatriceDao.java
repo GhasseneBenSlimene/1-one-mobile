@@ -1,4 +1,4 @@
-package com.example.one_mobile.data.local;
+package com.example.one_mobile.data.local.Dao;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -12,7 +12,7 @@ import java.util.List;
 @Dao
 public interface MatriceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertMatrice(Matrice matrice);
+    void insert(Matrice matrice);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<Matrice> matrices);
@@ -26,3 +26,4 @@ public interface MatriceDao {
     @Query("DELETE FROM matrices")
     void clearAll();
 }
+

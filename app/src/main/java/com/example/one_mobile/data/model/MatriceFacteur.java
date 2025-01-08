@@ -1,8 +1,6 @@
 package com.example.one_mobile.data.model;
 
-import androidx.room.Entity;
-
-@Entity(tableName = "matrice_facteurs")
+//@Entity(tableName = "matrice_facteurs")
 public class MatriceFacteur {
     private long id;
     private Facteur facteur;

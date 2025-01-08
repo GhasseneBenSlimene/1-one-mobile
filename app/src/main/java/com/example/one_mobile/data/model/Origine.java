@@ -8,7 +8,7 @@ public class Origine {
     @PrimaryKey
     private long id;
     private String lib;
-    private String code; // Champ ajouté
+    private String code;
 
     // Getters et Setters
     public long getId() {

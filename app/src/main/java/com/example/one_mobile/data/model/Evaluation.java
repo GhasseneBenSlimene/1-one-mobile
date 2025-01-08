@@ -1,25 +1,40 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.util.Date;
 
-@Entity(tableName = "evaluations")
+@Entity(
+        tableName = "evaluations",
+        foreignKeys = {
+                @ForeignKey(entity = Origine.class, parentColumns = "id", childColumns = "origine_id", onDelete = ForeignKey.CASCADE),
+                @ForeignKey(entity = Matrice.class, parentColumns = "id", childColumns = "matrice_id", onDelete = ForeignKey.CASCADE)
+        },
+        indices = {@Index("origine_id"), @Index("matrice_id")}
+)
 public class Evaluation {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     private long id;
-    private long origineId; // Foreign key reference to Origine
-    private long matriceId; // Foreign key reference to Matrice
+
+    @ColumnInfo(name = "origine_id")
+    private long origineId;
+
+    @ColumnInfo(name = "matrice_id")
+    private long matriceId;
+
     private float indice;
     private int indiceInt;
     private String desc;
     private String descCourt;
     private boolean valide;
     private Date date;
-    private Risque risque;
+//    private Risque risque;
 
-    // Getters and Setters
+    // Getters et Setters
     public long getId() {
         return id;
     }
@@ -92,11 +107,11 @@ public class Evaluation {
         this.date = date;
     }
 
-    public Risque getRisque() {
-        return risque;
-    }
-
-    public void setRisque(Risque risque) {
-        this.risque = risque;
-    }
+//    public Risque getRisque() {
+//        return risque;
+//    }
+//
+//    public void setRisque(Risque risque) {
+//        this.risque = risque;
+//    }
 }
