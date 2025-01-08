@@ -282,9 +282,12 @@ public class EvaluationSiteForm extends AppCompatActivity {
         evaluation.setOrigine(selectedOrigine);
         evaluation.setMatrice(selectedMatrice);
         evaluation.setDesc(description);
-        evaluation.setDescCourt(description);
-        evaluation.setIndiceInt(1);
-        evaluation.setIndice(1);
+        // evaluation.setDescCourt(description);
+
+        // Calculate the product of factor values
+        float product = calculateFactorValuesProduct();
+        evaluation.setIndiceInt((int) product);
+        evaluation.setIndice(product);
 
         // Format the date to ISO string with Locale.US
         Date currentDate = new Date();
@@ -315,5 +318,26 @@ public class EvaluationSiteForm extends AppCompatActivity {
                 Toast.makeText(this, "Failed to create EvaluationSite", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+
+    private float calculateFactorValuesProduct() {
+        float product = 1.0f;
+        for (Long key : factorValues.keySet()) {
+            Object value = factorValues.get(key);
+            if (value instanceof EditText) {
+                String text = ((EditText) value).getText().toString();
+                if (!text.isEmpty()) {
+                    product *= Float.parseFloat(text);
+                }
+            } else if (value instanceof Spinner) {
+                String selectedItem = (String) ((Spinner) value).getSelectedItem();
+                if (selectedItem != null && !selectedItem.isEmpty()) {
+                    String[] parts = selectedItem.split(" ");
+                    product *= Float.parseFloat(parts[parts.length - 1].replace("(", "").replace(")", ""));
+                }
+            }
+        }
+        return product;
     }
 }
