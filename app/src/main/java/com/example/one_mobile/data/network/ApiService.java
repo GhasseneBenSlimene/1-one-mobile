@@ -1,34 +1,27 @@
 package com.example.one_mobile.data.network;
 
+import com.example.one_mobile.data.model.AuthResponse;
+import com.example.one_mobile.data.model.AuthenticationRequest;
 import com.example.one_mobile.data.model.EvaluationSite;
-import com.example.one_mobile.data.model.Matrice;
-import com.example.one_mobile.data.model.Site;
-import com.example.one_mobile.data.model.Origine;
-import com.example.one_mobile.data.model.MatriceFacteur;
-import com.example.one_mobile.data.model.Facteur;
-import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.model.EvaluationValeur;
+import com.example.one_mobile.data.model.Facteur;
+import com.example.one_mobile.data.model.Matrice;
+import com.example.one_mobile.data.model.MatriceFacteur;
+import com.example.one_mobile.data.model.Origine;
+import com.example.one_mobile.data.model.RiskEvaluation;
 import com.example.one_mobile.data.model.Risque;
+import com.example.one_mobile.data.model.Site;
+import com.example.one_mobile.data.model.Valeur;
 
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-
-// RiskEvaluation
-import com.example.one_mobile.data.model.RiskEvaluation;
-
-// Authentication
-import com.example.one_mobile.data.model.AuthResponse;
-import com.example.one_mobile.data.model.AuthenticationRequest;
-
-
-import java.util.List;
 
 public interface ApiService {
     @GET("risks/sync")
@@ -60,7 +53,7 @@ public interface ApiService {
     Call<List<EvaluationSite>> getAllEvaluationSites();
 
     @POST("/evaluationSite/")
-    Call<EvaluationSite> createEvaluationSite(
+    Call<EvaluationSite> createEvaluationSite(  
             @Body EvaluationSite evaluationSite
     );
 
