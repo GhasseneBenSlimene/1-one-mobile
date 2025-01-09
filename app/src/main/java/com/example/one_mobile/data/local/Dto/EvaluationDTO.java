@@ -18,8 +18,9 @@ public class EvaluationDTO {
     private String desc;
     private String descCourt;
     private boolean valide;
-    private Date date;
-    private Date valid;
+    private String date;
+
+    private String valid;
 
     // Getters and Setters
     public long getId() {
@@ -94,19 +95,19 @@ public class EvaluationDTO {
         this.valide = valide;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
-    public Date getValid() {
+    public String getValid() {
         return valid;
     }
 
-    public void setValid(Date valid) {
+    public void setValid(String valid) {
         this.valid = valid;
     }
 
@@ -120,7 +121,7 @@ public class EvaluationDTO {
         evaluation.setDesc(this.getDesc());
         evaluation.setDescCourt(this.getDescCourt());
         evaluation.setValide(this.isValide());
-        evaluation.setDate(this.getDate());
+        evaluation.setDate(new Date());
         return evaluation;
     }
 }

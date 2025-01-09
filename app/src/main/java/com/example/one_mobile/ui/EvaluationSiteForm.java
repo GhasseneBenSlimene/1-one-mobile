@@ -27,11 +27,13 @@ import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 
 public class EvaluationSiteForm extends AppCompatActivity {
@@ -289,13 +291,16 @@ public class EvaluationSiteForm extends AppCompatActivity {
 
         // Format the date to ISO string with Locale.US
         Date currentDate = new Date();
-        evaluation.setDate(currentDate);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault());
+        String formattedDate = sdf.format(currentDate);
+        evaluation.setDate(formattedDate);
 
         // Set the valid date to one year after the current date
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
         calendar.add(Calendar.YEAR, 1);
-        evaluation.setValid(currentDate);
+        String validDate = sdf.format(calendar.getTime());
+        evaluation.setValid(validDate);
 
 
         // Set the EvaluationSite properties
