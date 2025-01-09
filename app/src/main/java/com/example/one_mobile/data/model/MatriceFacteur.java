@@ -1,5 +1,6 @@
 package com.example.one_mobile.data.model;
 
+//@Entity(tableName = "matrice_facteurs")
 public class MatriceFacteur {
     private long id;
     private Facteur facteur;

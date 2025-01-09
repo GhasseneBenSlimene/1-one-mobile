@@ -1,9 +1,14 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "origines")
 public class Origine {
+    @PrimaryKey
     private long id;
     private String lib;
-    private String code; // Champ ajouté
+    private String code;
 
     // Getters et Setters
     public long getId() {
@@ -28,5 +33,13 @@ public class Origine {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    @Override
+    public String toString() {
+        return "Matrice{" +
+                "id=" + id +
+                ", lib='" + lib + '\'' +
+                '}';
     }
 }

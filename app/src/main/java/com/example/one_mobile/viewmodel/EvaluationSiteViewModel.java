@@ -1,36 +1,59 @@
 package com.example.one_mobile.viewmodel;
 
-import android.app.Application;
+import android.content.Context;
 
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.Observer;
 
 import com.example.one_mobile.data.model.EvaluationSite;
+import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Origine;
+import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.repository.EvaluationSiteRepository;
 
 import java.util.List;
 
-public class EvaluationSiteViewModel extends AndroidViewModel {
+public class EvaluationSiteViewModel extends ViewModel {
+
+    private final EvaluationSiteRepository repository;
     private final EvaluationSiteRepository evaluationSiteRepository;
     private final LiveData<List<EvaluationSite>> allEvaluationSites;
     private final MutableLiveData<EvaluationSite> createdEvaluationSite;
 
-    public EvaluationSiteViewModel(Application application) {
-        super(application);
-        evaluationSiteRepository = new EvaluationSiteRepository();
+    public EvaluationSiteViewModel(Context context) {
+        repository = new EvaluationSiteRepository(context);
+        evaluationSiteRepository = new EvaluationSiteRepository(context);
         allEvaluationSites = evaluationSiteRepository.getAllEvaluationSites();
         createdEvaluationSite = new MutableLiveData<>();
     }
 
+    // Récupérer tous les EvaluationSites avec leurs détails
+    public LiveData<List<EvaluationSiteWithDetails>> getAllEvaluationSites() {
+        return repository.getAllEvaluationSites();
+    }
+
+    // Création d'un nouveau EvaluationSite
+    public void createEvaluationSite(EvaluationSite evaluationSite) {
+        repository.createEvaluationSite(evaluationSite).observeForever(newEvaluationSite -> {
+            if (newEvaluationSite != null) {
+                createdEvaluationSite.setValue(newEvaluationSite);
+            }
+        });
+    }
+
+    public LiveData<EvaluationSite> getCreatedEvaluationSite() {
+        return createdEvaluationSite;
+    }
+
+    // Gestion des Sites
     public LiveData<List<Site>> getAllSites() {
         return evaluationSiteRepository.getAllSites();
     }
@@ -40,26 +63,27 @@ public class EvaluationSiteViewModel extends AndroidViewModel {
     }
 
 
+    // Gestion des Origines
     public LiveData<List<Origine>> getAllOrigines() {
         return evaluationSiteRepository.getAllOrigines();
     }
 
+    // Gestion des Matrices
     public LiveData<List<Matrice>> getAllMatrices() {
         return evaluationSiteRepository.getAllMatrices();
     }
 
-    public LiveData<List<EvaluationSite>> getAllEvaluationSites() {
-        return allEvaluationSites;
-    }
-
+    // Gestion des MatriceFacteurs
     public LiveData<List<MatriceFacteur>> getMatriceFacteursByMatriceId(long matriceId) {
         return evaluationSiteRepository.getMatriceFacteursByMatriceId(matriceId);
     }
 
+    // Gestion des Valeurs
     public LiveData<List<Valeur>> getValeursByFacteurId(long facteurId) {
         return evaluationSiteRepository.getValeursByFacteurId(facteurId);
     }
 
+    // Gestion des Facteurs
     public LiveData<Facteur> getFacteurById(long facteurId) {
         return evaluationSiteRepository.getFacteurById(facteurId);
     }

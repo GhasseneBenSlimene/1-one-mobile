@@ -1,8 +1,10 @@
-package com.example.one_mobile.data.local;
+package com.example.one_mobile.data.local.Dao;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+
+import com.example.one_mobile.data.model.SyncQueue;
 
 import java.util.List;
 

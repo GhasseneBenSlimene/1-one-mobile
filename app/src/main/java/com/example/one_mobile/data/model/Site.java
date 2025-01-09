@@ -1,9 +1,14 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "sites")
 public class Site {
+    @PrimaryKey
     private long id;
     private String lib;
-    private String code; // Champ ajouté
+    private String code;
     private long effectif;
 
     // Getters et Setters
@@ -37,5 +42,13 @@ public class Site {
 
     public void setEffectif(long effectif) {
         this.effectif = effectif;
+    }
+
+    @Override
+    public String toString() {
+        return "Matrice{" +
+                "id=" + id +
+                ", lib='" + lib + '\'' +
+                '}';
     }
 }

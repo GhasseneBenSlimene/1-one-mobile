@@ -1,12 +1,17 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "facteurs")
 public class Facteur {
+    @PrimaryKey
     private long id;
     private String code;
     private String lib;
     private float type;
 
-    // Getters et Setters
+    // Getters and Setters
     public long getId() {
         return id;
     }

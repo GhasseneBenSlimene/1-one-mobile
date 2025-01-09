@@ -1,5 +1,6 @@
 package com.example.one_mobile.data.network;
 
+import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
 import com.example.one_mobile.data.model.AuthResponse;
 import com.example.one_mobile.data.model.AuthenticationRequest;
 import com.example.one_mobile.data.model.EvaluationSite;
@@ -50,7 +51,7 @@ public interface ApiService {
 
     // EvaluationSite
     @GET("/evaluationSite/")
-    Call<List<EvaluationSite>> getAllEvaluationSites();
+    Call<List<EvaluationSiteWithDetailsDTO>> getAllEvaluationSites();
 
     @POST("/evaluationSite/")
     Call<EvaluationSite> createEvaluationSite(  
