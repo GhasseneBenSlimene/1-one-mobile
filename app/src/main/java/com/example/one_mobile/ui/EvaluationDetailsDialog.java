@@ -1,6 +1,5 @@
 package com.example.one_mobile.ui;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,19 +13,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.one_mobile.R;
-import com.example.one_mobile.data.model.EvaluationSite;
+import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 
 public class EvaluationDetailsDialog extends DialogFragment {
 
-    private EvaluationSite evaluationSite;
+    private EvaluationSiteWithDetails evaluationSite;
     private OnActionListener listener;
 
     public interface OnActionListener {
-        void onModify(EvaluationSite evaluationSite);
-        void onDelete(EvaluationSite evaluationSite);
+        void onModify(EvaluationSiteWithDetails evaluationSite);
+        void onDelete(EvaluationSiteWithDetails evaluationSite);
     }
 
-    public EvaluationDetailsDialog(EvaluationSite evaluationSite, OnActionListener listener) {
+    public EvaluationDetailsDialog(EvaluationSiteWithDetails evaluationSite, OnActionListener listener) {
         this.evaluationSite = evaluationSite;
         this.listener = listener;
     }
@@ -44,7 +43,7 @@ public class EvaluationDetailsDialog extends DialogFragment {
 
         // Remplir les données
         siteTextView.setText("Site: " + evaluationSite.getSite().getLib());
-        risqueTextView.setText("Risque: " + evaluationSite.getEvaluation().getRisque().getLib());
+//        risqueTextView.setText("Risque: " + evaluationSite.getEvaluation().getRisque().getLib());
         descTextView.setText(evaluationSite.getEvaluation().getDesc());
         //dateTextView.setText("Date: " + evaluationSite.getDate());
        // validityTextView.setText("Validité: " + evaluationSite.getValidite());

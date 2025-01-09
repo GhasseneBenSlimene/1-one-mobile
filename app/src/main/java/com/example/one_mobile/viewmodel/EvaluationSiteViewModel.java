@@ -4,17 +4,16 @@ import android.content.Context;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
 
-import com.example.one_mobile.data.model.EvaluationSite;
+import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
 import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
-import com.example.one_mobile.data.model.Risque;
-import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Origine;
+import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.repository.EvaluationSiteRepository;
@@ -24,14 +23,10 @@ import java.util.List;
 public class EvaluationSiteViewModel extends ViewModel {
 
     private final EvaluationSiteRepository repository;
-    private final EvaluationSiteRepository evaluationSiteRepository;
-    private final LiveData<List<EvaluationSite>> allEvaluationSites;
-    private final MutableLiveData<EvaluationSite> createdEvaluationSite;
+    private final MutableLiveData<EvaluationSiteWithDetailsDTO> createdEvaluationSite;
 
     public EvaluationSiteViewModel(Context context) {
         repository = new EvaluationSiteRepository(context);
-        evaluationSiteRepository = new EvaluationSiteRepository(context);
-        allEvaluationSites = evaluationSiteRepository.getAllEvaluationSites();
         createdEvaluationSite = new MutableLiveData<>();
     }
 
@@ -40,59 +35,46 @@ public class EvaluationSiteViewModel extends ViewModel {
         return repository.getAllEvaluationSites();
     }
 
-    // Création d'un nouveau EvaluationSite
-    public void createEvaluationSite(EvaluationSite evaluationSite) {
-        repository.createEvaluationSite(evaluationSite).observeForever(newEvaluationSite -> {
-            if (newEvaluationSite != null) {
-                createdEvaluationSite.setValue(newEvaluationSite);
-            }
-        });
-    }
-
-    public LiveData<EvaluationSite> getCreatedEvaluationSite() {
-        return createdEvaluationSite;
-    }
-
     // Gestion des Sites
     public LiveData<List<Site>> getAllSites() {
-        return evaluationSiteRepository.getAllSites();
+        return repository.getAllSites();
     }
 
     public LiveData<List<Risque>> getAllRisques() {
-        return evaluationSiteRepository.getAllRisques();
+        return repository.getAllRisques();
     }
 
 
     // Gestion des Origines
     public LiveData<List<Origine>> getAllOrigines() {
-        return evaluationSiteRepository.getAllOrigines();
+        return repository.getAllOrigines();
     }
 
     // Gestion des Matrices
     public LiveData<List<Matrice>> getAllMatrices() {
-        return evaluationSiteRepository.getAllMatrices();
+        return repository.getAllMatrices();
     }
 
     // Gestion des MatriceFacteurs
     public LiveData<List<MatriceFacteur>> getMatriceFacteursByMatriceId(long matriceId) {
-        return evaluationSiteRepository.getMatriceFacteursByMatriceId(matriceId);
+        return repository.getMatriceFacteursByMatriceId(matriceId);
     }
 
     // Gestion des Valeurs
     public LiveData<List<Valeur>> getValeursByFacteurId(long facteurId) {
-        return evaluationSiteRepository.getValeursByFacteurId(facteurId);
+        return repository.getValeursByFacteurId(facteurId);
     }
 
     // Gestion des Facteurs
     public LiveData<Facteur> getFacteurById(long facteurId) {
-        return evaluationSiteRepository.getFacteurById(facteurId);
+        return repository.getFacteurById(facteurId);
     }
 
-    public LiveData<EvaluationSite> createEvaluationSite(EvaluationSite evaluationSite) {
-        LiveData<EvaluationSite> result = evaluationSiteRepository.createEvaluationSite(evaluationSite);
-        result.observeForever(new Observer<EvaluationSite>() {
+    public LiveData<EvaluationSiteWithDetailsDTO> createEvaluationSite(EvaluationSiteWithDetailsDTO evaluationSite) {
+        LiveData<EvaluationSiteWithDetailsDTO> result = repository.createEvaluationSite(evaluationSite);
+        result.observeForever(new Observer<EvaluationSiteWithDetailsDTO>() {
             @Override
-            public void onChanged(EvaluationSite evaluationSite) {
+            public void onChanged(EvaluationSiteWithDetailsDTO evaluationSite) {
                 createdEvaluationSite.setValue(evaluationSite);
             }
         });
@@ -100,7 +82,7 @@ public class EvaluationSiteViewModel extends ViewModel {
     }
 
 
-    public LiveData<EvaluationSite> getCreatedEvaluationSite() {
+    public LiveData<EvaluationSiteWithDetailsDTO> getCreatedEvaluationSite() {
         return createdEvaluationSite;
     }
 }

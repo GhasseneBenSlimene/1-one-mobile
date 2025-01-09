@@ -3,7 +3,6 @@ package com.example.one_mobile.data.network;
 import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
 import com.example.one_mobile.data.model.AuthResponse;
 import com.example.one_mobile.data.model.AuthenticationRequest;
-import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.EvaluationValeur;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
@@ -54,8 +53,8 @@ public interface ApiService {
     Call<List<EvaluationSiteWithDetailsDTO>> getAllEvaluationSites();
 
     @POST("/evaluationSite/")
-    Call<EvaluationSite> createEvaluationSite(  
-            @Body EvaluationSite evaluationSite
+    Call<EvaluationSiteWithDetailsDTO> createEvaluationSite(
+            @Body EvaluationSiteWithDetailsDTO evaluationSite
     );
 
 

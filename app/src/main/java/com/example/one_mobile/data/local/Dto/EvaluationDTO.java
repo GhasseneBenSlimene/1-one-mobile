@@ -3,12 +3,15 @@ package com.example.one_mobile.data.local.Dto;
 import com.example.one_mobile.data.model.Evaluation;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.Origine;
+import com.example.one_mobile.data.model.Risque;
 
 import java.util.Date;
 
 public class EvaluationDTO {
     private long id;
     private Origine origine;
+
+    private Risque risque;
     private Matrice matrice;
     private float indice;
     private int indiceInt;
@@ -16,6 +19,7 @@ public class EvaluationDTO {
     private String descCourt;
     private boolean valide;
     private Date date;
+    private Date valid;
 
     // Getters and Setters
     public long getId() {
@@ -32,6 +36,14 @@ public class EvaluationDTO {
 
     public void setOrigine(Origine origine) {
         this.origine = origine;
+    }
+
+    public Risque getRisque() {
+        return risque;
+    }
+
+    public void setRisque(Risque risque) {
+        this.risque = risque;
     }
 
     public Matrice getMatrice() {
@@ -88,6 +100,14 @@ public class EvaluationDTO {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public Date getValid() {
+        return valid;
+    }
+
+    public void setValid(Date valid) {
+        this.valid = valid;
     }
 
     public Evaluation toEvaluation() {

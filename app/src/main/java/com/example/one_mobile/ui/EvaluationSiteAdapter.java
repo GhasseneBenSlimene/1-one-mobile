@@ -9,20 +9,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.one_mobile.R;
-import com.example.one_mobile.data.model.EvaluationSite;
+import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 
 import java.util.List;
 
 public class EvaluationSiteAdapter extends RecyclerView.Adapter<EvaluationSiteAdapter.ViewHolder> {
 
-    private List<EvaluationSite> evaluationSites;
+    private List<EvaluationSiteWithDetails> evaluationSites;
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(EvaluationSite evaluationSite);
+        void onItemClick(EvaluationSiteWithDetails evaluationSite);
     }
 
-    public EvaluationSiteAdapter(List<EvaluationSite> evaluationSites) {
+    public EvaluationSiteAdapter(List<EvaluationSiteWithDetails> evaluationSites) {
         this.evaluationSites = evaluationSites;
     }
 
@@ -40,11 +40,11 @@ public class EvaluationSiteAdapter extends RecyclerView.Adapter<EvaluationSiteAd
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        EvaluationSite evaluationSite = evaluationSites.get(position);
+        EvaluationSiteWithDetails evaluationSite = evaluationSites.get(position);
 
         // Remplir les informations principales
         holder.siteTextView.setText("Site: " + evaluationSite.getSite().getLib());
-        holder.risqueTextView.setText("Risque: " + evaluationSite.getEvaluation().getRisque().getLib());
+//        holder.risqueTextView.setText("Risque: " + evaluationSite.getEvaluation().getRisque().getLib());
         holder.descriptionTextView.setText("Description: " + getShortDescription(evaluationSite.getEvaluation().getDesc()));
 
         // Listener pour les clics

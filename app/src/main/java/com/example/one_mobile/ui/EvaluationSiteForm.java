@@ -9,17 +9,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
-
-
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
-import com.example.one_mobile.data.model.EvaluationSite;
-import com.example.one_mobile.data.model.Evaluation;
+import com.example.one_mobile.data.local.Dto.EvaluationDTO;
+import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
@@ -28,14 +25,13 @@ import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
+import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Date;
-import java.util.Locale;
 
 
 public class EvaluationSiteForm extends AppCompatActivity {
@@ -63,8 +59,10 @@ public class EvaluationSiteForm extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.evaluation_site_form);
+        setContentView(R.layout.evaluation_site_form);
 
-        viewModel = new ViewModelProvider(this).get(EvaluationSiteViewModel.class);
+        EvaluationSiteViewModelFactory factory = new EvaluationSiteViewModelFactory(this);
+        viewModel = new ViewModelProvider(this, factory).get(EvaluationSiteViewModel.class);
 
         siteSpinner = findViewById(R.id.site_spinner);
         originSpinner = findViewById(R.id.origin_spinner);
@@ -269,15 +267,15 @@ public class EvaluationSiteForm extends AppCompatActivity {
         }
 
         // Create EvaluationSite
-        EvaluationSite evaluationSite = new EvaluationSite();
+        EvaluationSiteWithDetailsDTO evaluationSite = new EvaluationSiteWithDetailsDTO();
 
         // Ensure that the evaluation object is initialized
         if (evaluationSite.getEvaluation() == null) {
-            evaluationSite.setEvaluation(new Evaluation()); // Manually initialize if it's null
+            evaluationSite.setEvaluation(new EvaluationDTO()); // Manually initialize if it's null
         }
 
         // Populate the Evaluation object inside EvaluationSite
-        Evaluation evaluation = evaluationSite.getEvaluation();
+        EvaluationDTO evaluation = evaluationSite.getEvaluation();
         evaluation.setRisque(selectedRisque);
         evaluation.setOrigine(selectedOrigine);
         evaluation.setMatrice(selectedMatrice);
@@ -291,16 +289,13 @@ public class EvaluationSiteForm extends AppCompatActivity {
 
         // Format the date to ISO string with Locale.US
         Date currentDate = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault());
-        String formattedDate = sdf.format(currentDate);
-        evaluation.setDate(formattedDate);
+        evaluation.setDate(currentDate);
 
         // Set the valid date to one year after the current date
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
         calendar.add(Calendar.YEAR, 1);
-        String validDate = sdf.format(calendar.getTime());
-        evaluation.setValid(validDate);
+        evaluation.setValid(currentDate);
 
 
         // Set the EvaluationSite properties

@@ -20,9 +20,8 @@ import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
-import com.example.one_mobile.data.model.Risque;
-import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Origine;
+import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.network.ApiService;
@@ -204,8 +203,8 @@ public class EvaluationSiteRepository {
         return facteur;
     }
 
-    public LiveData<EvaluationSite> createEvaluationSite(EvaluationSite evaluationSite) {
-        MutableLiveData<EvaluationSite> createdEvaluationSite = new MutableLiveData<>();
+    public LiveData<EvaluationSiteWithDetailsDTO> createEvaluationSite(EvaluationSiteWithDetailsDTO evaluationSite) {
+        MutableLiveData<EvaluationSiteWithDetailsDTO> createdEvaluationSite = new MutableLiveData<>();
 
         tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
             @Override
@@ -215,9 +214,9 @@ public class EvaluationSiteRepository {
                 String cookies = xsrfTokenCookie + "; " + accessTokenCookie;
                 System.out.println("New access token: " + accessTokenCookie);
                 System.out.println("New xsrf token: " + xsrfTokenCookie);
-                apiService.createEvaluationSite(evaluationSite).enqueue(new Callback<EvaluationSite>() {
+                apiService.createEvaluationSite(evaluationSite).enqueue(new Callback<EvaluationSiteWithDetailsDTO>() {
                     @Override
-                    public void onResponse(Call<EvaluationSite> call, Response<EvaluationSite> response) {
+                    public void onResponse(Call<EvaluationSiteWithDetailsDTO> call, Response<EvaluationSiteWithDetailsDTO> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             createdEvaluationSite.setValue(response.body());
                         } else {
@@ -226,7 +225,7 @@ public class EvaluationSiteRepository {
                     }
 
                     @Override
-                    public void onFailure(Call<EvaluationSite> call, Throwable t) {
+                    public void onFailure(Call<EvaluationSiteWithDetailsDTO> call, Throwable t) {
                         createdEvaluationSite.setValue(null);
                         t.printStackTrace();
                     }

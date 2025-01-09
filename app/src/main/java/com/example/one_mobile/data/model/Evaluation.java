@@ -25,18 +25,13 @@ public class Evaluation {
 
     @ColumnInfo(name = "matrice_id")
     private long matriceId;
-
-    private Origine origine;
-    private Matrice matrice;
     private float indice;
     private int indiceInt;
     private String desc;
     private String descCourt;
     private boolean valide;
+    private Date valid;
     private Date date;
-    private String valid;
-    private String date;
-    private Risque risque;
 
     // Getters and Setters
     public long getId() {
@@ -49,14 +44,10 @@ public class Evaluation {
 
     public Long getOrigineId() {
         return origineId;
-    public Origine getOrigine() {
-        return origine;
     }
 
     public void setOrigineId(Long origineId) {
         this.origineId = origineId;
-    public void setOrigine(Origine origine) {
-        this.origine = origine;
     }
 
     public long getMatriceId() {
@@ -99,19 +90,27 @@ public class Evaluation {
         this.descCourt = descCourt;
     }
 
-    public String getValid() {
+    public boolean isValide() {
+        return valide;
+    }
+
+    public void setValide(boolean valide) {
+        this.valide = valide;
+    }
+
+    public Date getValid() {
         return valid;
     }
 
-    public void setValid(String valid) {
+    public void setValid(Date valid) {
         this.valid = valid;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
