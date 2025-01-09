@@ -3,13 +3,12 @@ package com.example.one_mobile.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.model.EvaluationSite;
@@ -19,7 +18,6 @@ import java.util.List;
 
 public class EvaluationListBySite extends AppCompatActivity {
 
-    private TableLayout tableLayout;
     private EvaluationSiteViewModel viewModel;
 
     @Override
@@ -31,7 +29,6 @@ public class EvaluationListBySite extends AppCompatActivity {
             getSupportActionBar().setTitle("Évaluation du risque par Site");
         }
 
-        tableLayout = findViewById(R.id.table_evaluation_risque);
         Button buttonAjouter = findViewById(R.id.button_ajouter);
 
         buttonAjouter.setOnClickListener(v -> openAddDialog());
@@ -51,26 +48,25 @@ public class EvaluationListBySite extends AppCompatActivity {
             return;
         }
 
-        for (EvaluationSite evaluationSite : evaluationSites) {
-            TableRow row = new TableRow(this);
+        RecyclerView recyclerView = findViewById(R.id.recycler_evaluation_risque);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        EvaluationSiteAdapter adapter = new EvaluationSiteAdapter(evaluationSites);
+        recyclerView.setAdapter(adapter);
 
-            TextView idTextView = new TextView(this);
-            idTextView.setText(String.valueOf(evaluationSite.getId()));
-            row.addView(idTextView);
+        adapter.setOnItemClickListener(evaluationSite -> {
+            EvaluationDetailsDialog dialog = new EvaluationDetailsDialog(evaluationSite, new EvaluationDetailsDialog.OnActionListener() {
+                @Override
+                public void onModify(EvaluationSite evaluationSite) {
+                    // Logique de modification
+                }
 
-            TextView siteTextView = new TextView(this);
-            siteTextView.setText(evaluationSite.getSite().getLib());
-            row.addView(siteTextView);
-
-            TextView risqueTextView = new TextView(this);
-            risqueTextView.setText(evaluationSite.getEvaluation().getRisque().getLib());
-            row.addView(risqueTextView);
-
-            TextView descTextView = new TextView(this);
-            descTextView.setText(evaluationSite.getEvaluation().getDesc());
-            row.addView(descTextView);
-
-            tableLayout.addView(row);
-        }
+                @Override
+                public void onDelete(EvaluationSite evaluationSite) {
+                    // Logique de suppression
+                }
+            });
+            dialog.show(getSupportFragmentManager(), "EvaluationDetailsDialog");
+        });
     }
+
 }
