@@ -1,12 +1,35 @@
 package com.example.one_mobile.data.model;
 
-//@Entity(tableName = "matrice_facteurs")
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+
+@Entity(
+        tableName = "matrice_facteurs",
+        foreignKeys = {
+                @ForeignKey(entity = Matrice.class,
+                        parentColumns = "id",
+                        childColumns = "matrice_id",
+                        onDelete = ForeignKey.CASCADE),
+                @ForeignKey(entity = Facteur.class,
+                        parentColumns = "id",
+                        childColumns = "facteur_id",
+                        onDelete = ForeignKey.CASCADE)
+        },
+        indices = {@Index("matrice_id"), @Index("facteur_id")}
+)
 public class MatriceFacteur {
+
+    @PrimaryKey(autoGenerate = true)
     private long id;
-    private Facteur facteur;
-    private Matrice matrice;
-    private long order;
-    private boolean requis;
+
+    @ColumnInfo(name = "matrice_id")
+    private long matriceId;
+
+    @ColumnInfo(name = "facteur_id")
+    private long facteurId;
 
     // Getters et Setters
     public long getId() {
@@ -17,35 +40,19 @@ public class MatriceFacteur {
         this.id = id;
     }
 
-    public Facteur getFacteur() {
-        return facteur;
+    public long getMatriceId() {
+        return matriceId;
     }
 
-    public void setFacteur(Facteur facteur) {
-        this.facteur = facteur;
+    public void setMatriceId(long matriceId) {
+        this.matriceId = matriceId;
     }
 
-    public Matrice getMatrice() {
-        return matrice;
+    public long getFacteurId() {
+        return facteurId;
     }
 
-    public void setMatrice(Matrice matrice) {
-        this.matrice = matrice;
-    }
-
-    public long getOrder() {
-        return order;
-    }
-
-    public void setOrder(long order) {
-        this.order = order;
-    }
-
-    public boolean isRequis() {
-        return requis;
-    }
-
-    public void setRequis(boolean requis) {
-        this.requis = requis;
+    public void setFacteurId(long facteurId) {
+        this.facteurId = facteurId;
     }
 }

@@ -64,23 +64,52 @@ public class EvaluationSiteRepository {
 
     //
     public LiveData<List<Site>> getAllSites() {
-        MutableLiveData<List<Site>> sites = new MutableLiveData<>();
-        apiService.getAllSites().enqueue(new Callback<List<Site>>() {
-            @Override
-            public void onResponse(Call<List<Site>> call, Response<List<Site>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    sites.setValue(response.body());
-                } else {
-                    sites.setValue(null);
-                }
-            }
+        MutableLiveData<List<Site>> liveData = new MutableLiveData<>();
 
-            @Override
-            public void onFailure(Call<List<Site>> call, Throwable t) {
-                sites.setValue(null);
-            }
+        if (isNetworkAvailable()) {
+            apiService.getAllSites().enqueue(new Callback<List<Site>>() {
+                @Override
+                public void onResponse(Call<List<Site>> call, Response<List<Site>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Site> sites = response.body();
+
+                        executor.execute(() -> {
+                            try {
+                                database.siteDao().insertAll(sites); // Insert or update
+                                Log.d("Repository", "Sites inserted/updated successfully.");
+                            } catch (Exception e) {
+                                Log.e("Repository", "Error inserting/updating Sites", e);
+                            }
+
+                            // Load data from the database after insert/update
+                            List<Site> localSites = database.siteDao().getAllSitesSync();
+                            liveData.postValue(localSites);
+                        });
+                    } else {
+                        Log.e("Repository", "API response for Sites unsuccessful.");
+                        loadSitesFromLocalDatabase(liveData);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Site>> call, Throwable t) {
+                    Log.e("Repository", "Failed to fetch Sites from API", t);
+                    loadSitesFromLocalDatabase(liveData);
+                }
+            });
+        } else {
+            Log.d("Repository", "No network available, loading Sites from local database.");
+            loadSitesFromLocalDatabase(liveData);
+        }
+
+        return liveData;
+    }
+
+    private void loadSitesFromLocalDatabase(MutableLiveData<List<Site>> liveData) {
+        executor.execute(() -> {
+            List<Site> localSites = database.siteDao().getAllSitesSync();
+            liveData.postValue(localSites);
         });
-        return sites;
     }
 
     public LiveData<List<Risque>> getAllRisques() {
@@ -104,104 +133,267 @@ public class EvaluationSiteRepository {
     }
 
     public LiveData<List<Origine>> getAllOrigines() {
-        MutableLiveData<List<Origine>> origines = new MutableLiveData<>();
-        apiService.getAllOrigines().enqueue(new Callback<List<Origine>>() {
-            @Override
-            public void onResponse(Call<List<Origine>> call, Response<List<Origine>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    origines.setValue(response.body());
-                } else {
-                    origines.setValue(null);
-                }
-            }
+        MutableLiveData<List<Origine>> liveData = new MutableLiveData<>();
 
-            @Override
-            public void onFailure(Call<List<Origine>> call, Throwable t) {
-                origines.setValue(null);
-            }
+        if (isNetworkAvailable()) {
+            apiService.getAllOrigines().enqueue(new Callback<List<Origine>>() {
+                @Override
+                public void onResponse(Call<List<Origine>> call, Response<List<Origine>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Origine> origines = response.body();
+
+                        executor.execute(() -> {
+                            try {
+                                database.origineDao().insertAll(origines); // Insert or update
+                                Log.d("Repository", "Origines inserted/updated successfully.");
+                            } catch (Exception e) {
+                                Log.e("Repository", "Error inserting/updating Origines", e);
+                            }
+
+                            // Load data from the database after insert/update
+                            List<Origine> localOrigines = database.origineDao().getAllOriginesSync();
+                            liveData.postValue(localOrigines);
+                        });
+                    } else {
+                        Log.e("Repository", "API response for Origines unsuccessful.");
+                        loadOriginesFromLocalDatabase(liveData);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Origine>> call, Throwable t) {
+                    Log.e("Repository", "Failed to fetch Origines from API", t);
+                    loadOriginesFromLocalDatabase(liveData);
+                }
+            });
+        } else {
+            Log.d("Repository", "No network available, loading Origines from local database.");
+            loadOriginesFromLocalDatabase(liveData);
+        }
+
+        return liveData;
+    }
+
+    private void loadOriginesFromLocalDatabase(MutableLiveData<List<Origine>> liveData) {
+        executor.execute(() -> {
+            List<Origine> localOrigines = database.origineDao().getAllOriginesSync();
+            liveData.postValue(localOrigines);
         });
-        return origines;
     }
 
     public LiveData<List<Matrice>> getAllMatrices() {
-        MutableLiveData<List<Matrice>> matrices = new MutableLiveData<>();
-        apiService.getAllMatrices().enqueue(new Callback<List<Matrice>>() {
-            @Override
-            public void onResponse(Call<List<Matrice>> call, Response<List<Matrice>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    matrices.setValue(response.body());
-                } else {
-                    matrices.setValue(null);
-                }
-            }
+        MutableLiveData<List<Matrice>> liveData = new MutableLiveData<>();
 
-            @Override
-            public void onFailure(Call<List<Matrice>> call, Throwable t) {
-                matrices.setValue(null);
-            }
-        });
-        return matrices;
+        if (isNetworkAvailable()) {
+            apiService.getAllMatrices().enqueue(new Callback<List<Matrice>>() {
+                @Override
+                public void onResponse(Call<List<Matrice>> call, Response<List<Matrice>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Matrice> matrices = response.body();
+
+                        executor.execute(() -> {
+                            try {
+                                database.matriceDao().insertAll(matrices); // Insert or update
+                                Log.d("Repository", "Matrices inserted/updated successfully.");
+                            } catch (Exception e) {
+                                Log.e("Repository", "Error inserting/updating Matrices", e);
+                            }
+
+                            // Load data from the database after insert/update
+                            List<Matrice> localMatrices = database.matriceDao().getAllMatricesSync();
+                            liveData.postValue(localMatrices);
+                        });
+                    } else {
+                        Log.e("Repository", "API response for Matrices unsuccessful.");
+                        loadMatricesFromLocalDatabase(liveData);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Matrice>> call, Throwable t) {
+                    Log.e("Repository", "Failed to fetch Matrices from API", t);
+                    loadMatricesFromLocalDatabase(liveData);
+                }
+            });
+        } else {
+            Log.d("Repository", "No network available, loading Matrices from local database.");
+            loadMatricesFromLocalDatabase(liveData);
+        }
+
+        return liveData;
     }
 
-    public LiveData<List<MatriceFacteur>> getMatriceFacteursByMatriceId(long matriceId) {
-        MutableLiveData<List<MatriceFacteur>> matriceFacteurs = new MutableLiveData<>();
-        apiService.getMatriceFacteursByMatriceId(matriceId).enqueue(new Callback<List<MatriceFacteur>>() {
-            @Override
-            public void onResponse(Call<List<MatriceFacteur>> call, Response<List<MatriceFacteur>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    matriceFacteurs.setValue(response.body());
-                } else {
-                    matriceFacteurs.setValue(null);
-                }
-            }
+    private void loadMatricesFromLocalDatabase(MutableLiveData<List<Matrice>> liveData) {
+        executor.execute(() -> {
+            List<Matrice> localMatrices = database.matriceDao().getAllMatricesSync();
+            liveData.postValue(localMatrices);
+        });
+    }
 
-            @Override
-            public void onFailure(Call<List<MatriceFacteur>> call, Throwable t) {
-                matriceFacteurs.setValue(null);
+    public LiveData<List<Facteur>> getFacteursByMatriceId(long matriceId) {
+        MutableLiveData<List<Facteur>> liveData = new MutableLiveData<>();
+
+        if (isNetworkAvailable()) {
+            apiService.getMatriceFacteursByMatriceId(matriceId).enqueue(new Callback<List<MatriceFacteur>>() {
+                @Override
+                public void onResponse(Call<List<MatriceFacteur>> call, Response<List<MatriceFacteur>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<MatriceFacteur> matriceFacteurs = response.body();
+                        List<Long> facteurIds = new ArrayList<>();
+
+                        // Collecter les IDs des facteurs à partir de MatriceFacteurs
+                        for (MatriceFacteur matriceFacteur : matriceFacteurs) {
+                            facteurIds.add(matriceFacteur.getFacteurId());
+                        }
+
+                        executor.execute(() -> {
+                            try {
+                                // Charger les facteurs correspondants depuis la base de données locale
+                                List<Facteur> facteurs = database.facteurDao().getFacteursByIds(facteurIds);
+
+                                // Si les facteurs ne sont pas complètement présents en local, loguer un avertissement
+                                if (facteurs.size() < facteurIds.size()) {
+                                    Log.w("Repository", "Some Facteurs are missing locally.");
+                                }
+
+                                // Poster les données locales sur LiveData
+                                liveData.postValue(facteurs);
+                            } catch (Exception e) {
+                                Log.e("Repository", "Error fetching Facteurs from local database", e);
+                            }
+                        });
+                    } else {
+                        Log.e("Repository", "API response for MatriceFacteurs unsuccessful.");
+                        loadFacteursFromLocalDatabase(matriceId, liveData);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<MatriceFacteur>> call, Throwable t) {
+                    Log.e("Repository", "Failed to fetch MatriceFacteurs from API", t);
+                    loadFacteursFromLocalDatabase(matriceId, liveData);
+                }
+            });
+        } else {
+            Log.d("Repository", "No network available, loading Facteurs from local database.");
+            loadFacteursFromLocalDatabase(matriceId, liveData);
+        }
+
+        return liveData;
+    }
+
+
+    private void loadFacteursFromLocalDatabase(long matriceId, MutableLiveData<List<Facteur>> liveData) {
+        executor.execute(() -> {
+            try {
+                List<Facteur> localFacteurs = database.facteurDao().getFacteursByMatriceId(matriceId);
+                liveData.postValue(localFacteurs);
+            } catch (Exception e) {
+                Log.e("Repository", "Error loading Facteurs from local database", e);
+                liveData.postValue(new ArrayList<>()); // Retourner une liste vide en cas d'erreur
             }
         });
-        return matriceFacteurs;
     }
+
+
 
     public LiveData<List<Valeur>> getValeursByFacteurId(long facteurId) {
-        MutableLiveData<List<Valeur>> valeurs = new MutableLiveData<>();
-        apiService.getValeursByFacteurId(facteurId).enqueue(new Callback<List<Valeur>>() {
-            @Override
-            public void onResponse(Call<List<Valeur>> call, Response<List<Valeur>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    valeurs.setValue(response.body());
-                } else {
-                    valeurs.setValue(null);
-                }
-            }
+        MutableLiveData<List<Valeur>> liveData = new MutableLiveData<>();
 
-            @Override
-            public void onFailure(Call<List<Valeur>> call, Throwable t) {
-                valeurs.setValue(null);
-            }
-        });
-        return valeurs;
+        if (isNetworkAvailable()) {
+            apiService.getValeursByFacteurId(facteurId).enqueue(new Callback<List<Valeur>>() {
+                @Override
+                public void onResponse(Call<List<Valeur>> call, Response<List<Valeur>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Valeur> valeurs = response.body();
+
+                        executor.execute(() -> {
+                            try {
+                                database.valeurDao().insertAll(valeurs); // Mise à jour locale
+                                Log.d("Repository", "Valeurs successfully inserted/updated.");
+                            } catch (Exception e) {
+                                Log.e("Repository", "Error inserting Valeurs", e);
+                            }
+
+                            List<Valeur> localValeurs = database.valeurDao().getValeursByFacteurId(facteurId);
+                            liveData.postValue(localValeurs);
+                        });
+                    } else {
+                        Log.e("Repository", "API response for Valeurs unsuccessful.");
+                        loadValeursFromLocalDatabase(facteurId, liveData);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Valeur>> call, Throwable t) {
+                    Log.e("Repository", "Failed to fetch Valeurs from API", t);
+                    loadValeursFromLocalDatabase(facteurId, liveData);
+                }
+            });
+        } else {
+            Log.d("Repository", "No network available, loading Valeurs from local database.");
+            loadValeursFromLocalDatabase(facteurId, liveData);
+        }
+
+        return liveData;
     }
+
+    private void loadValeursFromLocalDatabase(long facteurId, MutableLiveData<List<Valeur>> liveData) {
+        executor.execute(() -> {
+            List<Valeur> localValeurs = database.valeurDao().getValeursByFacteurId(facteurId);
+            liveData.postValue(localValeurs);
+        });
+    }
+
 
     public LiveData<Facteur> getFacteurById(long facteurId) {
-        MutableLiveData<Facteur> facteur = new MutableLiveData<>();
-        apiService.getFacteurById(facteurId).enqueue(new Callback<Facteur>() {
-            @Override
-            public void onResponse(Call<Facteur> call, Response<Facteur> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    facteur.setValue(response.body());
-                } else {
-                    facteur.setValue(null);
-                }
-            }
+        MutableLiveData<Facteur> liveData = new MutableLiveData<>();
 
-            @Override
-            public void onFailure(Call<Facteur> call, Throwable t) {
-                facteur.setValue(null);
-            }
-        });
-        return facteur;
+        if (isNetworkAvailable()) {
+            apiService.getFacteurById(facteurId).enqueue(new Callback<Facteur>() {
+                @Override
+                public void onResponse(Call<Facteur> call, Response<Facteur> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Facteur facteur = response.body();
+
+                        executor.execute(() -> {
+                            try {
+                                database.facteurDao().insert(facteur); // Mise à jour locale
+                                Log.d("Repository", "Facteur successfully inserted/updated.");
+                            } catch (Exception e) {
+                                Log.e("Repository", "Error inserting Facteur", e);
+                            }
+
+                            Facteur localFacteur = database.facteurDao().getFacteurById(facteurId);
+                            liveData.postValue(localFacteur);
+                        });
+                    } else {
+                        Log.e("Repository", "API response for Facteur unsuccessful.");
+                        loadFacteurFromLocalDatabase(facteurId, liveData);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Facteur> call, Throwable t) {
+                    Log.e("Repository", "Failed to fetch Facteur from API", t);
+                    loadFacteurFromLocalDatabase(facteurId, liveData);
+                }
+            });
+        } else {
+            Log.d("Repository", "No network available, loading Facteur from local database.");
+            loadFacteurFromLocalDatabase(facteurId, liveData);
+        }
+
+        return liveData;
     }
+
+    private void loadFacteurFromLocalDatabase(long facteurId, MutableLiveData<Facteur> liveData) {
+        executor.execute(() -> {
+            Facteur localFacteur = database.facteurDao().getFacteurById(facteurId);
+            liveData.postValue(localFacteur);
+        });
+    }
+
 
     public LiveData<EvaluationSiteWithDetailsDTO> createEvaluationSite(EvaluationSiteWithDetailsDTO evaluationSite) {
         MutableLiveData<EvaluationSiteWithDetailsDTO> createdEvaluationSite = new MutableLiveData<>();

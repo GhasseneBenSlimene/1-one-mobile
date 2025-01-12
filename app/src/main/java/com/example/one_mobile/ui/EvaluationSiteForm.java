@@ -19,7 +19,6 @@ import com.example.one_mobile.data.local.Dto.EvaluationDTO;
 import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
-import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
@@ -216,13 +215,12 @@ public class EvaluationSiteForm extends AppCompatActivity {
             return;
         }
 
-        viewModel.getMatriceFacteursByMatriceId(selectedMatrice.getId()).observe(this, matriceFacteurs -> {
-            if (matriceFacteurs != null && !matriceFacteurs.isEmpty()) {
+        // Observer pour charger les facteurs liés à la matrice
+        viewModel.getFacteursByMatriceId(selectedMatrice.getId()).observe(this, facteurs -> {
+            if (facteurs != null && !facteurs.isEmpty()) {
                 factorsContainer.removeAllViews();
 
-                for (MatriceFacteur matriceFacteur : matriceFacteurs) {
-                    Facteur facteur = matriceFacteur.getFacteur();
-
+                for (Facteur facteur : facteurs) {
                     if (facteur.getType() == 0) { // Type Libre
                         EditText editText = new EditText(this);
                         editText.setHint(facteur.getLib());
@@ -240,6 +238,7 @@ public class EvaluationSiteForm extends AppCompatActivity {
                                 LinearLayout.LayoutParams.WRAP_CONTENT
                         ));
 
+                        // Observer pour charger les valeurs liées au facteur
                         viewModel.getValeursByFacteurId(facteur.getId()).observe(this, valeurs -> {
                             if (valeurs != null && !valeurs.isEmpty()) {
                                 List<String> valeurNames = new ArrayList<>();
@@ -256,9 +255,14 @@ public class EvaluationSiteForm extends AppCompatActivity {
                         factorValues.put(facteur.getId(), spinner);
                     }
                 }
+            } else {
+                // Si aucun facteur n'est trouvé
+                factorsContainer.removeAllViews();
+                Toast.makeText(this, "Aucun facteur trouvé pour cette matrice.", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     private void submitEvaluationSite() {
         String description = descriptionEditText.getText().toString();

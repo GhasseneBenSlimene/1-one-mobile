@@ -21,6 +21,9 @@ public interface SiteDao {
     @Query("SELECT * FROM sites")
     LiveData<List<Site>> getAllSites();
 
+    @Query("SELECT * FROM sites")
+    List<Site> getAllSitesSync();
+
     @Query("SELECT * FROM sites WHERE id = :id")
     Site getSiteById(long id);
 

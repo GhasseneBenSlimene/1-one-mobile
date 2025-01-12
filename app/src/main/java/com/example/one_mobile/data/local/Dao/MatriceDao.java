@@ -1,5 +1,6 @@
 package com.example.one_mobile.data.local.Dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -21,7 +22,10 @@ public interface MatriceDao {
     Matrice getMatriceById(long id);
 
     @Query("SELECT * FROM matrices")
-    List<Matrice> getAllMatrices();
+    LiveData<List<Matrice>> getAllMatrices();
+
+    @Query("SELECT * FROM matrices")
+    List<Matrice> getAllMatricesSync();
 
     @Query("DELETE FROM matrices")
     void clearAll();

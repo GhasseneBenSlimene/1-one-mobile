@@ -1,5 +1,6 @@
 package com.example.one_mobile.data.local.Dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -21,7 +22,10 @@ public interface OrigineDao {
     Origine getOrigineById(long id);
 
     @Query("SELECT * FROM origines")
-    List<Origine> getAllOrigines();
+    LiveData<List<Origine>> getAllOrigines();
+
+    @Query("SELECT * FROM origines")
+    List<Origine> getAllOriginesSync();
 
     @Query("DELETE FROM origines")
     void clearAll();

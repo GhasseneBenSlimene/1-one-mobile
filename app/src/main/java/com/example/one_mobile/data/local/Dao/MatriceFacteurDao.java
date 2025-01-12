@@ -1,6 +1,5 @@
 package com.example.one_mobile.data.local.Dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -12,9 +11,25 @@ import java.util.List;
 
 @Dao
 public interface MatriceFacteurDao {
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(MatriceFacteur matriceFacteur);
 
-    @Query("SELECT * FROM matrice_facteur WHERE matrice_id = :matriceId")
-    LiveData<List<MatriceFacteur>> getMatriceFacteursByMatriceId(long matriceId);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(List<MatriceFacteur> matriceFacteurs);
+
+    @Query("SELECT * FROM matrice_facteurs WHERE matrice_id = :matriceId")
+    List<MatriceFacteur> getFacteursByMatriceId(long matriceId);
+
+    @Query("SELECT * FROM matrice_facteurs WHERE facteur_id = :facteurId")
+    List<MatriceFacteur> getMatricesByFacteurId(long facteurId);
+
+    @Query("DELETE FROM matrice_facteurs WHERE matrice_id = :matriceId")
+    void deleteByMatriceId(long matriceId);
+
+    @Query("DELETE FROM matrice_facteurs WHERE facteur_id = :facteurId")
+    void deleteByFacteurId(long facteurId);
+
+    @Query("DELETE FROM matrice_facteurs")
+    void clearAll();
 }

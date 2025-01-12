@@ -11,7 +11,6 @@ import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
 import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
-import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
@@ -55,9 +54,9 @@ public class EvaluationSiteViewModel extends ViewModel {
         return repository.getAllMatrices();
     }
 
-    // Gestion des MatriceFacteurs
-    public LiveData<List<MatriceFacteur>> getMatriceFacteursByMatriceId(long matriceId) {
-        return repository.getMatriceFacteursByMatriceId(matriceId);
+    // Gestion des Facteurs
+    public LiveData<List<Facteur>> getFacteursByMatriceId(long matriceId) {
+        return repository.getFacteursByMatriceId(matriceId);
     }
 
     // Gestion des Valeurs

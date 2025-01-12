@@ -1,5 +1,6 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -10,6 +11,9 @@ public class Facteur {
     private String code;
     private String lib;
     private float type;
+
+    @ColumnInfo(name = "matrice_id") // Relation logique avec Matrice
+    private long matriceId;
 
     // Getters and Setters
     public long getId() {
@@ -42,5 +46,13 @@ public class Facteur {
 
     public void setType(float type) {
         this.type = type;
+    }
+
+    public long getMatriceId() {
+        return matriceId;
+    }
+
+    public void setMatriceId(long matriceId) {
+        this.matriceId = matriceId;
     }
 }

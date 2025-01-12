@@ -1,12 +1,28 @@
 package com.example.one_mobile.data.model;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "valeurs")
+@Entity(
+        tableName = "valeurs",
+        foreignKeys = @ForeignKey(
+                entity = Facteur.class,
+                parentColumns = "id",
+                childColumns = "facteur_id",
+                onDelete = ForeignKey.CASCADE
+        ),
+        indices = {@Index("facteur_id")}
+)
 public class Valeur {
-    @PrimaryKey
-    private Long id;
+
+    @PrimaryKey(autoGenerate = true)
+    private long id;
+
+    @ColumnInfo(name = "facteur_id")
+    private long facteurId;
 
     private String code;
 
@@ -16,15 +32,21 @@ public class Valeur {
 
     private String desc;
 
-    private Facteur facteur;
-
-    // Getters and setters
-    public Long getId() {
+    // Getters et Setters
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
+    }
+
+    public long getFacteurId() {
+        return facteurId;
+    }
+
+    public void setFacteurId(long facteurId) {
+        this.facteurId = facteurId;
     }
 
     public String getCode() {
@@ -57,13 +79,5 @@ public class Valeur {
 
     public void setDesc(String desc) {
         this.desc = desc;
-    }
-
-    public Facteur getFacteur() {
-        return facteur;
-    }
-
-    public void setFacteur(Facteur facteur) {
-        this.facteur = facteur;
     }
 }
