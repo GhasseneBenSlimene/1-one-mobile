@@ -15,6 +15,9 @@ import androidx.fragment.app.DialogFragment;
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class EvaluationDetailsDialog extends DialogFragment {
 
     private EvaluationSiteWithDetails evaluationSite;
@@ -40,13 +43,35 @@ public class EvaluationDetailsDialog extends DialogFragment {
         TextView descTextView = view.findViewById(R.id.text_description_details);
         TextView dateTextView = view.findViewById(R.id.text_date_details);
         TextView validityTextView = view.findViewById(R.id.text_validity_details);
+        TextView matriceTextView = view.findViewById(R.id.text_matrice_details);
+        TextView facteurTextView = view.findViewById(R.id.text_facteur_details);
+        TextView indiceTextView = view.findViewById(R.id.text_indice_details);
 
         // Remplir les données
         siteTextView.setText("Site: " + evaluationSite.getSite().getLib());
-//        risqueTextView.setText("Risque: " + evaluationSite.getEvaluation().getRisque().getLib());
+        //risqueTextView.setText("Risque: " + evaluationSite.getEvaluation().getRisque().getLib());
         descTextView.setText(evaluationSite.getEvaluation().getDesc());
-        //dateTextView.setText("Date: " + evaluationSite.getDate());
-       // validityTextView.setText("Validité: " + evaluationSite.getValidite());
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        if (evaluationSite.getEvaluation().getDate() != null) {
+            dateTextView.setText("Date: " + dateFormat.format(evaluationSite.getEvaluation().getDate()));
+        } else {
+            dateTextView.setText("Date: N/A");
+        }
+
+        matriceTextView.setText("Matrice: " + evaluationSite.getEvaluation().getMatriceId());
+
+
+
+        if (evaluationSite.getEvaluation().getValid() != null) {
+            validityTextView.setText("Validité: " + dateFormat.format(evaluationSite.getEvaluation().getValid()));
+        } else {
+            validityTextView.setText("Validité: N/A");
+        }
+
+
+        facteurTextView.setText("Facteur: " + "Nom du facteur"); // Remplacez par le nom du facteur si nécessaire
+        indiceTextView.setText("Indice: " + evaluationSite.getEvaluation().getIndice());
 
         // Scrolling pour la description
         ScrollView descScroll = view.findViewById(R.id.scroll_description);

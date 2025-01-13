@@ -5,6 +5,8 @@ import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Risque;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class EvaluationDTO {
@@ -121,7 +123,27 @@ public class EvaluationDTO {
         evaluation.setDesc(this.getDesc());
         evaluation.setDescCourt(this.getDescCourt());
         evaluation.setValide(this.isValide());
-        evaluation.setDate(new Date());
+
+        String[] dateFormats = {
+                "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+                "yyyy-MM-dd HH:mm:ss",
+                "yyyy-MM-dd"
+        };
+        Date parsedDate = null;
+
+        for (String format : dateFormats) {
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+                parsedDate = dateFormat.parse(this.getDate());
+                break;
+            } catch (ParseException e) {
+                // Continue to the next format
+            }
+        }
+
+        evaluation.setDate(parsedDate);
+
         return evaluation;
     }
+
 }

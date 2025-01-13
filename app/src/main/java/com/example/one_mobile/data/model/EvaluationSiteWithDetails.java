@@ -32,7 +32,7 @@ public class EvaluationSiteWithDetails {
         this.site = site;
     }
 
-    public Evaluation getEvaluation() {
+    public Evaluation   getEvaluation() {
         return evaluation;
     }
 

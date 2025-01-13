@@ -79,6 +79,34 @@
             android:textColor="#666666"
             android:layout_marginBottom="16dp" />
 
+        <!-- Ajoutez ces TextViews dans le LinearLayout principal -->
+        <TextView
+            android:id="@+id/text_matrice_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Matrice : Nom de la matrice"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/text_facteur_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Facteur : Nom du facteur"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/text_indice_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Indice : Valeur de l'indice"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp" />
+
         <!-- Boutons -->
         <LinearLayout
             android:layout_width="match_parent"
