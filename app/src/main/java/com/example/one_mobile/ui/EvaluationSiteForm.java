@@ -60,7 +60,6 @@ public class EvaluationSiteForm extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.evaluation_site_form);
-        setContentView(R.layout.evaluation_site_form);
 
         EvaluationSiteViewModelFactory factory = new EvaluationSiteViewModelFactory(this);
         viewModel = new ViewModelProvider(this, factory).get(EvaluationSiteViewModel.class);
@@ -316,6 +315,7 @@ public class EvaluationSiteForm extends AppCompatActivity {
                 Toast.makeText(this, "EvaluationSite created successfully!", Toast.LENGTH_SHORT).show();
                 // Redirect to EvaluationListBySite activity
                 Intent intent = new Intent(EvaluationSiteForm.this, EvaluationListBySite.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
             } else {

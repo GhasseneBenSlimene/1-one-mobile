@@ -7,18 +7,25 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
+import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
+import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
+
+import java.text.SimpleDateFormat;
 
 public class EvaluationDetailsDialog extends DialogFragment {
 
     private EvaluationSiteWithDetails evaluationSite;
     private OnActionListener listener;
+    private EvaluationSiteViewModel viewModel;
 
     public interface OnActionListener {
         void onModify(EvaluationSiteWithDetails evaluationSite);
@@ -34,6 +41,9 @@ public class EvaluationDetailsDialog extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_evaluation_details, container, false);
+        EvaluationSiteViewModelFactory factory = new EvaluationSiteViewModelFactory(requireContext());
+        viewModel = new ViewModelProvider(this, factory).get(EvaluationSiteViewModel.class);
+
 
         TextView siteTextView = view.findViewById(R.id.text_site_details);
         TextView risqueTextView = view.findViewById(R.id.text_risque_details);
@@ -45,7 +55,9 @@ public class EvaluationDetailsDialog extends DialogFragment {
         siteTextView.setText("Site: " + evaluationSite.getSite().getLib());
 //        risqueTextView.setText("Risque: " + evaluationSite.getEvaluation().getRisque().getLib());
         descTextView.setText(evaluationSite.getEvaluation().getDesc());
-        //dateTextView.setText("Date: " + evaluationSite.getDate());
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        dateTextView.setText("Date: " + dateFormat.format(evaluationSite.getEvaluation().getDate()));
        // validityTextView.setText("Validité: " + evaluationSite.getValidite());
 
         // Scrolling pour la description
@@ -62,13 +74,26 @@ public class EvaluationDetailsDialog extends DialogFragment {
         });
 
         deleteButton.setOnClickListener(v -> {
-            if (listener != null) listener.onDelete(evaluationSite);
-            dismiss();
+            deleteEvaluationSite();
         });
 
         cancelButton.setOnClickListener(v -> dismiss());
 
         return view;
+    }
+
+
+
+    private void deleteEvaluationSite() {
+        viewModel.deleteEvaluationSite(evaluationSite.getEvaluationSite().getId()).observe(this, isDeleted -> {
+            if (isDeleted) {
+                Toast.makeText(getContext(), "EvaluationSite deleted successfully!", Toast.LENGTH_SHORT).show();
+                if (listener != null) listener.onDelete(evaluationSite);
+                dismiss();
+            } else {
+                Toast.makeText(getContext(), "Failed to delete EvaluationSite", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
 

@@ -15,11 +15,15 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.one_mobile.R;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
+import com.example.one_mobile.viewmodel.AuthViewModel;
 
 public class BaseActivity extends AppCompatActivity {
+    private AuthViewModel authViewModel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
     }
 
     @Override
@@ -46,16 +50,32 @@ public class BaseActivity extends AppCompatActivity {
 
         Button logoutButton = findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(v -> {
-            preferences.edit().clear().apply();
-            Intent intent = new Intent(this, AuthActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+            authViewModel.logout().observe(this, success -> {
+                if (success) {
+                    preferences.edit().clear().apply();
+                    Intent intent = new Intent(this, AuthActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "Failed to logout", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         Button syncButton = findViewById(R.id.syncButton);
         syncButton.setOnClickListener(v -> syncData());
     }
 
+    @Override
+    public void onBackPressed() {
+        // Navigate to the home screen instead of going back to AuthActivity
+        super.onBackPressed();
+        Intent intent = new Intent(this, Home.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+    
     private void syncData() {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Synchronisation en cours...");

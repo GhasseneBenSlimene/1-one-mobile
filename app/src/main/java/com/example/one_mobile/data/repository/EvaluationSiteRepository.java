@@ -452,6 +452,35 @@ public class EvaluationSiteRepository {
         return createdEvaluationSite;
     }
 
+    // Add this method to EvaluationSiteRepository
+    public LiveData<Boolean> deleteEvaluationSite(long evaluationSiteId) {
+        MutableLiveData<Boolean> deleteResult = new MutableLiveData<>();
+
+        tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
+            @Override
+            public void onTokensRefreshed() {
+                apiService.deleteEvaluationSite(evaluationSiteId).enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        deleteResult.setValue(response.isSuccessful());
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        deleteResult.setValue(false);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                deleteResult.setValue(false);
+            }
+        });
+
+        return deleteResult;
+    }
+
     public void updateMatricesAndOrigines() {
         if (isNetworkAvailable()) {
             // Fetch matrices from the server

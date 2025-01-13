@@ -50,27 +50,6 @@ public class EvaluationListBySite extends AppCompatActivity {
             return;
         }
 
-//        for (EvaluationSiteWithDetails evaluationSite : evaluationSites) {
-//            TableRow row = new TableRow(this);
-//
-//            TextView idTextView = new TextView(this);
-//            idTextView.setText(String.valueOf(evaluationSite.getEvaluation().getId()));
-//            row.addView(idTextView);
-//
-//            TextView siteTextView = new TextView(this);
-//            siteTextView.setText(evaluationSite.getSite().getLib());
-//            row.addView(siteTextView);
-//
-////            TextView risqueTextView = new TextView(this);
-////            risqueTextView.setText(evaluationSite.getEvaluation().getRisque().getLib());
-////            row.addView(risqueTextView);
-//
-//            TextView descTextView = new TextView(this);
-//            descTextView.setText(evaluationSite.getEvaluation().getDesc());
-//            row.addView(descTextView);
-
-//            tableLayout.addView(row);
-//        }
         RecyclerView recyclerView = findViewById(R.id.recycler_evaluation_risque);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         EvaluationSiteAdapter adapter = new EvaluationSiteAdapter(evaluationSites);
@@ -84,8 +63,8 @@ public class EvaluationListBySite extends AppCompatActivity {
                 }
 
                 @Override
-                public void onDelete(EvaluationSiteWithDetails   evaluationSite) {
-                    // Logique de suppression
+                public void onDelete(EvaluationSiteWithDetails evaluationSite) {
+                    viewModel.getAllEvaluationSites().observe(EvaluationListBySite.this, EvaluationListBySite.this::populateTable);
                 }
             });
             dialog.show(getSupportFragmentManager(), "EvaluationDetailsDialog");

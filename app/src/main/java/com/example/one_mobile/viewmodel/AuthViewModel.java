@@ -20,4 +20,7 @@ public class AuthViewModel extends ViewModel {
     public LiveData<AuthResponse> authenticate(String username, String password) {
         return authRepository.authenticate(username, password);
     }
+    public LiveData<Boolean> logout() {
+        return authRepository.logout();
+    }
 }

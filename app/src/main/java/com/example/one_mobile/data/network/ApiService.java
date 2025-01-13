@@ -17,6 +17,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -40,6 +41,8 @@ public interface ApiService {
     @GET("/auth/refresh")
     Call<Void> refreshTokens(
     );
+    @GET("/auth/logout")
+    Call<Void> logout();
 
 
     @POST("/auth")
@@ -56,6 +59,9 @@ public interface ApiService {
     Call<EvaluationSiteWithDetailsDTO> createEvaluationSite(
             @Body EvaluationSiteWithDetailsDTO evaluationSite
     );
+
+    @DELETE("/evaluationSite/{id}")
+    Call<Void> deleteEvaluationSite(@Path("id") long evaluationSiteId);
 
 
     // Matrice

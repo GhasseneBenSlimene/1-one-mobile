@@ -84,6 +84,9 @@ public class EvaluationSiteViewModel extends ViewModel {
         return createdEvaluationSite;
     }
 
+    public LiveData<Boolean> deleteEvaluationSite(long evaluationSiteId) {
+        return repository.deleteEvaluationSite(evaluationSiteId);
+    }
 
     public LiveData<EvaluationSiteWithDetailsDTO> getCreatedEvaluationSite() {
         return createdEvaluationSite;
