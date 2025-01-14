@@ -69,6 +69,10 @@ public class EvaluationSiteViewModel extends ViewModel {
         return repository.getFacteurById(facteurId);
     }
 
+    public LiveData<Boolean> synchronizeData() {
+        return repository.synchronizeData();
+    }
+
     public LiveData<EvaluationSiteWithDetailsDTO> createEvaluationSite(EvaluationSiteWithDetailsDTO evaluationSite) {
         LiveData<EvaluationSiteWithDetailsDTO> result = repository.createEvaluationSite(evaluationSite);
         result.observeForever(new Observer<EvaluationSiteWithDetailsDTO>() {

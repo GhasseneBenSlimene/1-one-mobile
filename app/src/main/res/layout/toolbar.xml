@@ -33,11 +33,23 @@
             android:textColor="@android:color/white" />
 
         <Button
+            android:id="@+id/syncButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="Sync"
+            android:layout_gravity="end|center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:textColor="@color/white" />
+
+        <Button
             android:id="@+id/logoutButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Déconnexion"
             android:background="?attr/selectableItemBackground"
             android:textColor="@android:color/white" />
+
     </LinearLayout>
 </androidx.appcompat.widget.Toolbar>

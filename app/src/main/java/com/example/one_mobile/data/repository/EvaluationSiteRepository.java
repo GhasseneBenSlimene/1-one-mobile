@@ -569,6 +569,111 @@ public class EvaluationSiteRepository {
         });
     }
 
+    // EvaluationSiteRepository.java
+    public LiveData<Boolean> synchronizeData() {
+        MutableLiveData<Boolean> syncResult = new MutableLiveData<>();
+
+        if (!isNetworkAvailable()) {
+            Log.d("Repository", "No network available. Skipping synchronization.");
+            syncResult.postValue(false);
+            return syncResult;
+        }
+
+        executor.execute(() -> {
+            try {
+                Log.d("Repository", "Starting synchronization...");
+
+                // Synchronize sites
+                List<Site> sites = apiService.getAllSites().execute().body();
+                if (sites != null) {
+                    database.siteDao().insertAll(sites);
+                    Log.d("Repository", "Sites synchronized: " + sites.size());
+                } else {
+                    Log.e("Repository", "Failed to synchronize Sites.");
+                }
+
+                // Synchronize origines
+                List<Origine> origines = apiService.getAllOrigines().execute().body();
+                if (origines != null) {
+                    database.origineDao().insertAll(origines);
+                    Log.d("Repository", "Origines synchronized: " + origines.size());
+                } else {
+                    Log.e("Repository", "Failed to synchronize Origines.");
+                }
+
+                // Synchronize matrices
+                List<Matrice> matrices = apiService.getAllMatrices().execute().body();
+                if (matrices != null) {
+                    database.matriceDao().insertAll(matrices);
+                    Log.d("Repository", "Matrices synchronized: " + matrices.size());
+
+                    // Synchronize facteurs for each matrice
+                    for (Matrice matrice : matrices) {
+                        List<MatriceFacteurDto> matriceFacteursDto = apiService.getMatriceFacteursByMatriceId(matrice.getId()).execute().body();
+                        if (matriceFacteursDto != null) {
+                            List<Facteur> facteurs = new ArrayList<>();
+                            for (MatriceFacteurDto dto : matriceFacteursDto) {
+                                Facteur facteur = dto.getFacteur();
+                                if (facteur != null) {
+                                    facteur.setMatriceId(matrice.getId());
+                                    facteurs.add(facteur);
+                                }
+                            }
+                            database.facteurDao().insertAll(facteurs);
+                            Log.d("Repository", "Facteurs synchronized for Matrice ID " + matrice.getId() + ": " + facteurs.size());
+
+                            // Synchronize valeurs for each facteur
+                            for (Facteur facteur : facteurs) {
+                                List<Valeur> valeurs = apiService.getValeursByFacteurId(facteur.getId()).execute().body();
+                                if (valeurs != null) {
+                                    for (Valeur valeur : valeurs) {
+                                        valeur.setFacteurId(facteur.getId());
+                                    }
+                                    database.valeurDao().insertAll(valeurs);
+                                    Log.d("Repository", "Valeurs synchronized for Facteur ID " + facteur.getId() + ": " + valeurs.size());
+                                } else {
+                                    Log.e("Repository", "Failed to synchronize Valeurs for Facteur ID " + facteur.getId());
+                                }
+                            }
+                        } else {
+                            Log.e("Repository", "Failed to synchronize MatriceFacteurs for Matrice ID " + matrice.getId());
+                        }
+                    }
+                } else {
+                    Log.e("Repository", "Failed to synchronize Matrices.");
+                }
+
+                // Synchronize evaluations and evaluation sites
+                List<EvaluationSiteWithDetailsDTO> evaluationSitesDto = apiService.getAllEvaluationSites().execute().body();
+                if (evaluationSitesDto != null) {
+                    List<Evaluation> evaluations = new ArrayList<>();
+                    List<EvaluationSite> evaluationSites = new ArrayList<>();
+                    for (EvaluationSiteWithDetailsDTO dto : evaluationSitesDto) {
+                        Evaluation evaluation = dto.getEvaluation().toEvaluation();
+                        if (!evaluations.contains(evaluation)) {
+                            evaluations.add(evaluation);
+                        }
+                        evaluationSites.add(dto.toEvaluationSite());
+                    }
+                    database.evaluationDao().insertAll(evaluations);
+                    database.evaluationSiteDao().insertAll(evaluationSites);
+                    Log.d("Repository", "Evaluation sites synchronized: " + evaluationSites.size());
+                } else {
+                    Log.e("Repository", "Failed to synchronize Evaluation Sites.");
+                }
+
+                Log.d("Repository", "Synchronization completed successfully.");
+                syncResult.postValue(true);
+            } catch (Exception e) {
+                Log.e("Repository", "Error during synchronization", e);
+                syncResult.postValue(false);
+            }
+        });
+
+        return syncResult;
+    }
+
+
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

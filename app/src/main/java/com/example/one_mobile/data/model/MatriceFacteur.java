@@ -22,7 +22,7 @@ import androidx.room.PrimaryKey;
 )
 public class MatriceFacteur {
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     private long id;
 
     @ColumnInfo(name = "matrice_id")

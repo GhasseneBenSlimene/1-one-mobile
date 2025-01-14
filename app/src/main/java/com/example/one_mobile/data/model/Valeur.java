@@ -18,7 +18,7 @@ import androidx.room.PrimaryKey;
 )
 public class Valeur {
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     private long id;
 
     @ColumnInfo(name = "facteur_id")
