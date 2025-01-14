@@ -2,44 +2,15 @@ package com.example.one_mobile.data.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
-
-@Entity(
-        tableName = "matrice_facteurs",
-        foreignKeys = {
-                @ForeignKey(entity = Matrice.class,
-                        parentColumns = "id",
-                        childColumns = "matrice_id",
-                        onDelete = ForeignKey.CASCADE),
-                @ForeignKey(entity = Facteur.class,
-                        parentColumns = "id",
-                        childColumns = "facteur_id",
-                        onDelete = ForeignKey.CASCADE)
-        },
-        indices = {@Index("matrice_id"), @Index("facteur_id")}
-)
+@Entity(primaryKeys = {"matriceId", "facteurId"})
 public class MatriceFacteur {
-
-    @PrimaryKey
-    private long id;
-
-    @ColumnInfo(name = "matrice_id")
+    @ColumnInfo(name = "matriceId")
     private long matriceId;
 
-    @ColumnInfo(name = "facteur_id")
+    @ColumnInfo(name = "facteurId")
     private long facteurId;
 
-    // Getters et Setters
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
+    // Getters and Setters
     public long getMatriceId() {
         return matriceId;
     }

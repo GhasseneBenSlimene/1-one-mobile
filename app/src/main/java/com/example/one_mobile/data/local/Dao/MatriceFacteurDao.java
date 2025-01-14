@@ -5,6 +5,8 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
+import com.example.one_mobile.data.model.Facteur;
+import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
 
 import java.util.List;
@@ -13,26 +15,11 @@ import java.util.List;
 public interface MatriceFacteurDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(MatriceFacteur matriceFacteur);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<MatriceFacteur> matriceFacteurs);
 
-    @Query("SELECT * FROM matrice_facteurs WHERE matrice_id = :matriceId")
-    List<MatriceFacteur> getMatriceFacteursByMatriceId(long matriceId);
+    @Query("SELECT * FROM facteurs WHERE id IN (SELECT facteurId FROM MatriceFacteur WHERE matriceId = :matriceId)")
+    List<Facteur> getFacteursByMatriceId(long matriceId);
 
-    @Query("SELECT * FROM matrice_facteurs WHERE matrice_id = :matriceId")
-    List<MatriceFacteur> getFacteursByMatriceId(long matriceId);
-
-    @Query("SELECT * FROM matrice_facteurs WHERE facteur_id = :facteurId")
-    List<MatriceFacteur> getMatricesByFacteurId(long facteurId);
-
-    @Query("DELETE FROM matrice_facteurs WHERE matrice_id = :matriceId")
-    void deleteByMatriceId(long matriceId);
-
-    @Query("DELETE FROM matrice_facteurs WHERE facteur_id = :facteurId")
-    void deleteByFacteurId(long facteurId);
-
-    @Query("DELETE FROM matrice_facteurs")
-    void clearAll();
+    @Query("SELECT * FROM matrices WHERE id IN (SELECT matriceId FROM MatriceFacteur WHERE facteurId = :facteurId)")
+    List<Matrice> getMatricesByFacteurId(long facteurId);
 }

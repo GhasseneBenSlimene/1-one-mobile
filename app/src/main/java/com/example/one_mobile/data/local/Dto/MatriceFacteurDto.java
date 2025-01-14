@@ -36,7 +36,6 @@ public class MatriceFacteurDto {
 
     public MatriceFacteur toMatriceFacteur() {
         MatriceFacteur matriceFacteur = new MatriceFacteur();
-        matriceFacteur.setId(this.id);
         matriceFacteur.setFacteurId(this.facteur != null ? this.facteur.getId() : 0);
         matriceFacteur.setMatriceId(this.matrice != null ? this.matrice.getId() : 0);
         return matriceFacteur;
