@@ -10,16 +10,17 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.one_mobile.data.local.AppDatabase;
 import com.example.one_mobile.data.local.Dao.EvaluationSiteDao;
+import com.example.one_mobile.data.local.Dao.FacteurDao;
 import com.example.one_mobile.data.local.Dao.MatriceDao;
 import com.example.one_mobile.data.local.Dao.OrigineDao;
 import com.example.one_mobile.data.local.Dao.SiteDao;
 import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
+import com.example.one_mobile.data.local.Dto.MatriceFacteurDto;
 import com.example.one_mobile.data.model.Evaluation;
 import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
-import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
@@ -46,6 +47,7 @@ public class EvaluationSiteRepository {
     private final MatriceDao matriceDao;
     private final OrigineDao origineDao;
     private final SiteDao siteDao;
+    private final FacteurDao facteurDao;
     private final ExecutorService executor;
     private final Context context;
     private final AppDatabase database;
@@ -56,6 +58,7 @@ public class EvaluationSiteRepository {
         matriceDao = AppDatabase.getInstance(context).matriceDao();
         origineDao = AppDatabase.getInstance(context).origineDao();
         siteDao = AppDatabase.getInstance(context).siteDao();
+        facteurDao = AppDatabase.getInstance(context).facteurDao();
         executor = Executors.newSingleThreadExecutor();
         this.database = AppDatabase.getInstance(context);
         this.context = context;
@@ -234,42 +237,41 @@ public class EvaluationSiteRepository {
         MutableLiveData<List<Facteur>> liveData = new MutableLiveData<>();
 
         if (isNetworkAvailable()) {
-            apiService.getMatriceFacteursByMatriceId(matriceId).enqueue(new Callback<List<MatriceFacteur>>() {
+            apiService.getMatriceFacteursByMatriceId(matriceId).enqueue(new Callback<List<MatriceFacteurDto>>() {
                 @Override
-                public void onResponse(Call<List<MatriceFacteur>> call, Response<List<MatriceFacteur>> response) {
+                public void onResponse(Call<List<MatriceFacteurDto>> call, Response<List<MatriceFacteurDto>> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        List<MatriceFacteur> matriceFacteurs = response.body();
-                        List<Long> facteurIds = new ArrayList<>();
+                        List<MatriceFacteurDto> dtoList = response.body();
+                        List<Facteur> facteurs = new ArrayList<>();
 
-                        // Collecter les IDs des facteurs à partir de MatriceFacteurs
-                        for (MatriceFacteur matriceFacteur : matriceFacteurs) {
-                            facteurIds.add(matriceFacteur.getFacteurId());
+                        for (MatriceFacteurDto dto : dtoList) {
+                            Facteur facteur = dto.getFacteur(); // Récupérer le Facteur complet depuis le DTO
+                            if (facteur != null) {
+                                facteur.setMatriceId(matriceId); // Ajouter la relation avec la Matrice
+                                facteurs.add(facteur);
+                            }
                         }
 
                         executor.execute(() -> {
                             try {
-                                // Charger les facteurs correspondants depuis la base de données locale
-                                List<Facteur> facteurs = database.facteurDao().getFacteursByIds(facteurIds);
+                                database.facteurDao().insertAll(facteurs); // Enregistrer les Facteurs dans la base locale
+                                Log.d("Repository", "Facteurs successfully inserted/updated.");
 
-                                // Si les facteurs ne sont pas complètement présents en local, loguer un avertissement
-                                if (facteurs.size() < facteurIds.size()) {
-                                    Log.w("Repository", "Some Facteurs are missing locally.");
-                                }
-
-                                // Poster les données locales sur LiveData
-                                liveData.postValue(facteurs);
+                                // Charger les données locales
+                                List<Facteur> localFacteurs = database.facteurDao().getFacteursByMatriceId(matriceId);
+                                liveData.postValue(localFacteurs);
                             } catch (Exception e) {
-                                Log.e("Repository", "Error fetching Facteurs from local database", e);
+                                Log.e("Repository", "Error inserting or loading Facteurs", e);
                             }
                         });
                     } else {
-                        Log.e("Repository", "API response for MatriceFacteurs unsuccessful.");
+                        Log.e("Repository", "API response unsuccessful for MatriceFacteurs.");
                         loadFacteursFromLocalDatabase(matriceId, liveData);
                     }
                 }
 
                 @Override
-                public void onFailure(Call<List<MatriceFacteur>> call, Throwable t) {
+                public void onFailure(Call<List<MatriceFacteurDto>> call, Throwable t) {
                     Log.e("Repository", "Failed to fetch MatriceFacteurs from API", t);
                     loadFacteursFromLocalDatabase(matriceId, liveData);
                 }
@@ -282,20 +284,12 @@ public class EvaluationSiteRepository {
         return liveData;
     }
 
-
     private void loadFacteursFromLocalDatabase(long matriceId, MutableLiveData<List<Facteur>> liveData) {
         executor.execute(() -> {
-            try {
-                List<Facteur> localFacteurs = database.facteurDao().getFacteursByMatriceId(matriceId);
-                liveData.postValue(localFacteurs);
-            } catch (Exception e) {
-                Log.e("Repository", "Error loading Facteurs from local database", e);
-                liveData.postValue(new ArrayList<>()); // Retourner une liste vide en cas d'erreur
-            }
+            List<Facteur> localFacteurs = database.facteurDao().getFacteursByMatriceId(matriceId);
+            liveData.postValue(localFacteurs);
         });
     }
-
-
 
     public LiveData<List<Valeur>> getValeursByFacteurId(long facteurId) {
         MutableLiveData<List<Valeur>> liveData = new MutableLiveData<>();
@@ -307,16 +301,23 @@ public class EvaluationSiteRepository {
                     if (response.isSuccessful() && response.body() != null) {
                         List<Valeur> valeurs = response.body();
 
+                        // Associer le facteurId aux valeurs si nécessaire
+                        for (Valeur valeur : valeurs) {
+                            valeur.setFacteurId(facteurId); // Ajouter la relation
+                        }
+
                         executor.execute(() -> {
                             try {
-                                database.valeurDao().insertAll(valeurs); // Mise à jour locale
+                                // Insérer les Valeurs dans la base locale
+                                database.valeurDao().insertAll(valeurs);
                                 Log.d("Repository", "Valeurs successfully inserted/updated.");
+
+                                // Charger les Valeurs locales
+                                List<Valeur> localValeurs = database.valeurDao().getValeursByFacteurId(facteurId);
+                                liveData.postValue(localValeurs);
                             } catch (Exception e) {
                                 Log.e("Repository", "Error inserting Valeurs", e);
                             }
-
-                            List<Valeur> localValeurs = database.valeurDao().getValeursByFacteurId(facteurId);
-                            liveData.postValue(localValeurs);
                         });
                     } else {
                         Log.e("Repository", "API response for Valeurs unsuccessful.");
@@ -340,10 +341,15 @@ public class EvaluationSiteRepository {
 
     private void loadValeursFromLocalDatabase(long facteurId, MutableLiveData<List<Valeur>> liveData) {
         executor.execute(() -> {
-            List<Valeur> localValeurs = database.valeurDao().getValeursByFacteurId(facteurId);
-            liveData.postValue(localValeurs);
+            try {
+                List<Valeur> localValeurs = database.valeurDao().getValeursByFacteurId(facteurId);
+                liveData.postValue(localValeurs);
+            } catch (Exception e) {
+                Log.e("Repository", "Error loading Valeurs from local database", e);
+            }
         });
     }
+
 
 
     public LiveData<Facteur> getFacteurById(long facteurId) {
@@ -442,7 +448,6 @@ public class EvaluationSiteRepository {
                     if (response.isSuccessful() && response.body() != null) {
                         List<Matrice> matrices = response.body();
                         executor.execute(() -> {
-                            matriceDao.clearAll(); // Clear the local Matrice table
                             matriceDao.insertAll(matrices); // Insert the latest Matrices
                         });
                     }
@@ -461,7 +466,6 @@ public class EvaluationSiteRepository {
                     if (response.isSuccessful() && response.body() != null) {
                         List<Origine> origines = response.body();
                         executor.execute(() -> {
-                            origineDao.clearAll(); // Clear the local Origine table
                             origineDao.insertAll(origines); // Insert the latest Origines
                         });
                     }
@@ -511,27 +515,6 @@ public class EvaluationSiteRepository {
                             } catch (Exception e) {
                                 Log.e("EvaluationSiteRepository", "Error processing DTO: " + dto, e);
                             }
-                        }
-                        Log.d("EvaluationSiteRepository", "Finished processing DTOs:");
-                        Log.d("EvaluationSiteRepository", "Matrices size: " + matrices.size());
-                        for (Matrice matrice : matrices) {
-                            Log.d("EvaluationSiteRepository", "Matrice: " + matrice.toString());
-                        }
-                        Log.d("EvaluationSiteRepository", "Origines size: " + origines.size());
-                        for (Origine origine : origines) {
-                            Log.d("EvaluationSiteRepository", "Origine: " + origine.toString());
-                        }
-                        Log.d("EvaluationSiteRepository", "Sites size: " + sites.size());
-                        for (Site site : sites) {
-                            Log.d("EvaluationSiteRepository", "Site: " + site.toString());
-                        }
-                        Log.d("EvaluationSiteRepository", "Evaluations size: " + evaluations.size());
-                        for (Evaluation evaluation : evaluations) {
-                            Log.d("EvaluationSiteRepository", "Evaluation: " + evaluation.toString());
-                        }
-                        Log.d("EvaluationSiteRepository", "EvaluationSites size: " + evaluationSites.size());
-                        for (EvaluationSite evaluationSite : evaluationSites) {
-                            Log.d("EvaluationSiteRepository", "EvaluationSite: " + evaluationSite.toString());
                         }
 
                         // Save data to the local database

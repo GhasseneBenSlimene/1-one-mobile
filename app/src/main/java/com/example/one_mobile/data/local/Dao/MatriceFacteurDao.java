@@ -19,6 +19,9 @@ public interface MatriceFacteurDao {
     void insertAll(List<MatriceFacteur> matriceFacteurs);
 
     @Query("SELECT * FROM matrice_facteurs WHERE matrice_id = :matriceId")
+    List<MatriceFacteur> getMatriceFacteursByMatriceId(long matriceId);
+
+    @Query("SELECT * FROM matrice_facteurs WHERE matrice_id = :matriceId")
     List<MatriceFacteur> getFacteursByMatriceId(long matriceId);
 
     @Query("SELECT * FROM matrice_facteurs WHERE facteur_id = :facteurId")
