@@ -634,20 +634,25 @@ public class EvaluationSiteRepository {
             try {
                 Log.d("Repository", "Starting synchronization...");
 
-                // Synchronize pending requests
+                // Étape 1 : Synchroniser les requêtes en attente
                 boolean syncPendingSuccess = synchronizePendingRequests();
                 if (!syncPendingSuccess) {
                     syncResult.postValue(false);
                     return;
                 }
 
-                // Clear the database
+                // Étape 2 : Nettoyer la base locale
                 clearDatabase();
 
-
-                // Import data from API
+                // Étape 3 : Importer les données depuis l'API
                 boolean importSuccess = importDataFromApi();
-                syncResult.postValue(importSuccess);
+                if (!importSuccess) {
+                    syncResult.postValue(false);
+                    return;
+                }
+
+                Log.d("Repository", "Synchronization completed successfully.");
+                syncResult.postValue(true);
             } catch (Exception e) {
                 Log.e("Repository", "Error during synchronization", e);
                 syncResult.postValue(false);
@@ -656,6 +661,7 @@ public class EvaluationSiteRepository {
 
         return syncResult;
     }
+
 
     private void clearDatabase() {
         executor.execute(() -> {
@@ -668,6 +674,7 @@ public class EvaluationSiteRepository {
                 database.facteurDao().clearAll();
                 database.valeurDao().clearAll();
                 database.matriceFacteurDao().clearAll();
+                database.pendingRequestDao().clearAll();
                 Log.d("Repository", "Database cleared successfully.");
             } catch (Exception e) {
                 Log.e("Repository", "Error clearing database", e);
@@ -766,68 +773,108 @@ public class EvaluationSiteRepository {
             List<PendingRequest> pendingRequests = database.pendingRequestDao().getAll();
 
             for (PendingRequest request : pendingRequests) {
-                try {
-                    // Refresh tokens before each request
-                    tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
-                        @Override
-                        public void onTokensRefreshed() {
-                            executor.execute(() -> {
-                                try {
-                                    switch (request.getType()) {
-                                        case "CREATE":
-                                            Log.d("Repository", "Processing CREATE request for EvaluationSite");
-                                            EvaluationSiteWithDetailsDTO evaluationSite =
-                                                    new Gson().fromJson(request.getPayload(), EvaluationSiteWithDetailsDTO.class);
-                                            Call<EvaluationSiteWithDetailsDTO> createCall = apiService.createEvaluationSite(evaluationSite);
-                                            Response<EvaluationSiteWithDetailsDTO> createResponse = createCall.execute();
-                                            if (!createResponse.isSuccessful()) {
-                                                Log.e("Repository", "Create request failed with code: " + createResponse.code());
-                                                throw new Exception("Create request failed with code: " + createResponse.code());
-                                            }
-                                            Log.d("Repository", "CREATE request successful for EvaluationSite");
-                                            break;
-
-                                        case "DELETE":
-                                            Log.d("Repository", "Processing DELETE request for EvaluationSite with ID: " + request.getEntityId());
-                                            Call<Void> deleteCall = apiService.deleteEvaluationSite(request.getEntityId());
-                                            Response<Void> deleteResponse = deleteCall.execute();
-                                            if (!deleteResponse.isSuccessful()) {
-                                                Log.e("Repository", "Delete request failed with code: " + deleteResponse.code());
-                                                throw new Exception("Delete request failed with code: " + deleteResponse.code());
-                                            }
-                                            Log.d("Repository", "DELETE request successful for EvaluationSite with ID: " + request.getEntityId());
-                                            break;
-                                    }
-
-                                    // If successful, delete the request from the queue
-                                    database.pendingRequestDao().deleteById(request.getId());
-                                } catch (Exception e) {
-                                    Log.e("Repository", "Error synchronizing request: " + request.getEntityType(), e);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            Log.e("Repository", "Token refresh failed for request: " + request.getEntityType());
-                        }
-                    });
-
-                    // Wait for token refresh to complete
-                    synchronized (tokenRefresherRepository) {
-                        tokenRefresherRepository.wait();
-                    }
-                } catch (Exception e) {
-                    Log.e("Repository", "Error synchronizing request: " + request.getEntityType(), e);
+                boolean requestProcessed = processSinglePendingRequestWithTokenRefresh(request);
+                if (!requestProcessed) {
+                    Log.e("Repository", "Failed to process request: " + request.getId());
                     return false;
                 }
             }
             return true;
         } catch (Exception e) {
-            Log.e("Repository", "Error fetching pending requests", e);
+            Log.e("Repository", "Error processing pending requests", e);
             return false;
         }
     }
+
+    private boolean processSinglePendingRequestWithTokenRefresh(PendingRequest request) {
+        try {
+            // Rafraîchir les tokens
+            MutableLiveData<Boolean> tokenRefreshed = new MutableLiveData<>();
+            tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
+                @Override
+                public void onTokensRefreshed() {
+                    Log.d("Repository", "Tokens refreshed successfully for request: " + request.getId());
+                    tokenRefreshed.postValue(true);
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.e("Repository", "Failed to refresh tokens for request: " + request.getId());
+                    tokenRefreshed.postValue(false);
+                }
+            });
+
+            // Attendre que le rafraîchissement des tokens soit terminé
+            while (tokenRefreshed.getValue() == null) {
+                Thread.sleep(100); // Polling
+            }
+
+            if (!tokenRefreshed.getValue()) {
+                return false; // Échec du rafraîchissement des tokens
+            }
+
+            // Traiter la requête après le rafraîchissement des tokens
+            switch (request.getType()) {
+                case "CREATE":
+                    return processCreateRequest(request);
+
+                case "DELETE":
+                    return processDeleteRequest(request);
+
+                default:
+                    Log.e("Repository", "Unknown request type: " + request.getType());
+                    return false;
+            }
+        } catch (Exception e) {
+            Log.e("Repository", "Error processing request with token refresh: " + request.getId(), e);
+            return false;
+        }
+    }
+
+    private boolean processCreateRequest(PendingRequest request) {
+        try {
+            Log.d("Repository", "Processing CREATE request for EvaluationSite");
+            EvaluationSiteWithDetailsDTO evaluationSite =
+                    new Gson().fromJson(request.getPayload(), EvaluationSiteWithDetailsDTO.class);
+
+            Response<EvaluationSiteWithDetailsDTO> createResponse = apiService.createEvaluationSite(evaluationSite).execute();
+            if (!createResponse.isSuccessful()) {
+                Log.e("Repository", "CREATE request failed with code: " + createResponse.code());
+                return false;
+            }
+
+            // Supprimer la requête de la file d'attente si elle a été traitée avec succès
+            database.pendingRequestDao().deleteById(request.getId());
+            Log.d("Repository", "CREATE request successful for EvaluationSite");
+            return true;
+
+        } catch (Exception e) {
+            Log.e("Repository", "Error processing CREATE request: " + request.getId(), e);
+            return false;
+        }
+    }
+
+    private boolean processDeleteRequest(PendingRequest request) {
+        try {
+            Log.d("Repository", "Processing DELETE request for EvaluationSite with ID: " + request.getEntityId());
+
+            Response<Void> deleteResponse = apiService.deleteEvaluationSite(request.getEntityId()).execute();
+            if (!deleteResponse.isSuccessful()) {
+                Log.e("Repository", "DELETE request failed with code: " + deleteResponse.code());
+                return false;
+            }
+
+            // Supprimer la requête de la file d'attente si elle a été traitée avec succès
+            database.pendingRequestDao().deleteById(request.getId());
+            Log.d("Repository", "DELETE request successful for EvaluationSite with ID: " + request.getEntityId());
+            return true;
+
+        } catch (Exception e) {
+            Log.e("Repository", "Error processing DELETE request: " + request.getId(), e);
+            return false;
+        }
+    }
+
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager =

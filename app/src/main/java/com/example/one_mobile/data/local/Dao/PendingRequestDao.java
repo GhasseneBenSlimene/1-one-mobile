@@ -19,4 +19,7 @@ public interface PendingRequestDao {
 
     @Query("SELECT * FROM pending_requests ORDER BY timestamp ASC")
     List<PendingRequest> getAll();
+
+    @Query("DELETE FROM pending_requests")
+    void clearAll();
 }
