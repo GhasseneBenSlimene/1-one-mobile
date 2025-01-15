@@ -13,6 +13,7 @@ import com.example.one_mobile.data.local.Dao.EvaluationSiteDao;
 import com.example.one_mobile.data.local.Dao.FacteurDao;
 import com.example.one_mobile.data.local.Dao.MatriceDao;
 import com.example.one_mobile.data.local.Dao.OrigineDao;
+import com.example.one_mobile.data.local.Dao.PendingRequestDao;
 import com.example.one_mobile.data.local.Dao.SiteDao;
 import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
 import com.example.one_mobile.data.local.Dto.MatriceFacteurDto;
@@ -23,12 +24,13 @@ import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Origine;
+import com.example.one_mobile.data.model.PendingRequest;
 import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
 import com.example.one_mobile.data.network.ApiService;
 import com.example.one_mobile.data.network.RetrofitClient;
-import com.example.one_mobile.data.network.TokenManager;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,8 +54,11 @@ public class EvaluationSiteRepository {
     private final ExecutorService executor;
     private final Context context;
     private final AppDatabase database;
-
+    private final PendingRequestDao pendingRequestDao;
+    private final Gson gson;
     public EvaluationSiteRepository(Context context) {
+        pendingRequestDao = AppDatabase.getInstance(context).pendingRequestDao();
+        gson = new Gson();
         apiService = RetrofitClient.getApiService();
         evaluationSiteDao = AppDatabase.getInstance(context).evaluationSiteDao();
         matriceDao = AppDatabase.getInstance(context).matriceDao();
@@ -64,6 +69,123 @@ public class EvaluationSiteRepository {
         this.database = AppDatabase.getInstance(context);
         this.context = context;
         tokenRefresherRepository = new TokenRefresherRepository();
+    }
+    public LiveData<EvaluationSiteWithDetailsDTO> createEvaluationSite(EvaluationSiteWithDetailsDTO evaluationSite) {
+        MutableLiveData<EvaluationSiteWithDetailsDTO> createdEvaluationSite = new MutableLiveData<>();
+
+        if (!isNetworkAvailable()) {
+            // Ajouter la requête dans la file d'attente
+            executor.execute(() -> {
+                try {
+                    // Convert DTO to entities
+                    EvaluationSite evaluationSiteEntity = evaluationSite.toEvaluationSite();
+                    Site siteEntity = evaluationSite.getSite();
+                    Evaluation evaluationEntity = evaluationSite.getEvaluation().toEvaluation();
+
+                    // Insert entities into the local database
+                    database.siteDao().insert(siteEntity);
+                    database.evaluationDao().insert(evaluationEntity);
+                    database.evaluationSiteDao().insert(evaluationSiteEntity);
+
+                    PendingRequest pendingRequest = new PendingRequest();
+                    pendingRequest.setType("CREATE");
+                    pendingRequest.setEntityType("EvaluationSite");
+                    pendingRequest.setPayload(new Gson().toJson(evaluationSite));
+                    pendingRequest.setTimestamp(System.currentTimeMillis());
+                    database.pendingRequestDao().insert(pendingRequest);
+                    Log.d("Repository", "Requête CREATE ajoutée à la file d'attente.");
+                    createdEvaluationSite.postValue(evaluationSite); // Mettez à jour localement
+                } catch (Exception e) {
+                    Log.e("Repository", "Erreur lors de l'ajout à la file d'attente", e);
+                    createdEvaluationSite.postValue(null);
+                }
+            });
+            return createdEvaluationSite;
+        }
+
+        // Envoyer la requête en ligne
+        tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
+            @Override
+            public void onTokensRefreshed() {
+                apiService.createEvaluationSite(evaluationSite).enqueue(new Callback<EvaluationSiteWithDetailsDTO>() {
+                    @Override
+                    public void onResponse(Call<EvaluationSiteWithDetailsDTO> call, Response<EvaluationSiteWithDetailsDTO> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            createdEvaluationSite.setValue(response.body());
+                        } else {
+                            createdEvaluationSite.setValue(null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<EvaluationSiteWithDetailsDTO> call, Throwable t) {
+                        createdEvaluationSite.setValue(null);
+                        t.printStackTrace();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                createdEvaluationSite.setValue(null);
+            }
+        });
+
+        return createdEvaluationSite;
+    }
+
+    public LiveData<Boolean> deleteEvaluationSite(long evaluationSiteId) {
+        MutableLiveData<Boolean> deleteResult = new MutableLiveData<>();
+
+        if (!isNetworkAvailable()) {
+            // Ajouter la requête dans la file d'attente
+            executor.execute(() -> {
+                try {
+                    PendingRequest pendingRequest = new PendingRequest();
+                    pendingRequest.setType("DELETE");
+                    pendingRequest.setEntityType("EvaluationSite");
+                    pendingRequest.setEntityId(evaluationSiteId);
+                    pendingRequest.setTimestamp(System.currentTimeMillis());
+                    database.pendingRequestDao().insert(pendingRequest);
+                    Log.d("Repository", "Requête DELETE ajoutée à la file d'attente.");
+
+                    // Suppression locale
+                    database.evaluationSiteDao().deleteById(evaluationSiteId);
+                    Log.d("Repository", "EvaluationSite supprimé localement.");
+                    deleteResult.postValue(true);
+                } catch (Exception e) {
+                    Log.e("Repository", "Erreur lors de l'ajout à la file d'attente", e);
+                    deleteResult.postValue(false);
+                }
+            });
+            return deleteResult;
+        }
+
+        // Envoyer la requête en ligne
+        tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
+            @Override
+            public void onTokensRefreshed() {
+                apiService.deleteEvaluationSite(evaluationSiteId).enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        deleteResult.setValue(response.isSuccessful());
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        deleteResult.setValue(false);
+                        t.printStackTrace();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                deleteResult.setValue(false);
+            }
+        });
+
+        return deleteResult;
     }
 
     //
@@ -363,8 +485,6 @@ public class EvaluationSiteRepository {
         });
     }
 
-
-
     public LiveData<Facteur> getFacteurById(long facteurId) {
         MutableLiveData<Facteur> liveData = new MutableLiveData<>();
 
@@ -411,117 +531,6 @@ public class EvaluationSiteRepository {
             Facteur localFacteur = database.facteurDao().getFacteurById(facteurId);
             liveData.postValue(localFacteur);
         });
-    }
-
-
-    public LiveData<EvaluationSiteWithDetailsDTO> createEvaluationSite(EvaluationSiteWithDetailsDTO evaluationSite) {
-        MutableLiveData<EvaluationSiteWithDetailsDTO> createdEvaluationSite = new MutableLiveData<>();
-
-        tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
-            @Override
-            public void onTokensRefreshed() {
-                String accessTokenCookie = "accessTokenCookie=" + TokenManager.getInstance().getAccessToken();
-                String xsrfTokenCookie = "XSRF-TOKEN=" + TokenManager.getInstance().getXsrfToken();
-                String cookies = xsrfTokenCookie + "; " + accessTokenCookie;
-                System.out.println("New access token: " + accessTokenCookie);
-                System.out.println("New xsrf token: " + xsrfTokenCookie);
-                apiService.createEvaluationSite(evaluationSite).enqueue(new Callback<EvaluationSiteWithDetailsDTO>() {
-                    @Override
-                    public void onResponse(Call<EvaluationSiteWithDetailsDTO> call, Response<EvaluationSiteWithDetailsDTO> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            createdEvaluationSite.setValue(response.body());
-                        } else {
-                            createdEvaluationSite.setValue(null);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<EvaluationSiteWithDetailsDTO> call, Throwable t) {
-                        createdEvaluationSite.setValue(null);
-                        t.printStackTrace();
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure() {
-                createdEvaluationSite.setValue(null);
-            }
-
-        });
-        return createdEvaluationSite;
-    }
-
-    // Add this method to EvaluationSiteRepository
-    public LiveData<Boolean> deleteEvaluationSite(long evaluationSiteId) {
-        MutableLiveData<Boolean> deleteResult = new MutableLiveData<>();
-
-        tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
-            @Override
-            public void onTokensRefreshed() {
-                apiService.deleteEvaluationSite(evaluationSiteId).enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        deleteResult.setValue(response.isSuccessful());
-                    }
-
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        deleteResult.setValue(false);
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure() {
-                deleteResult.setValue(false);
-            }
-        });
-
-        return deleteResult;
-    }
-
-    public void updateMatricesAndOrigines() {
-        if (isNetworkAvailable()) {
-            // Fetch matrices from the server
-            apiService.getAllMatrices().enqueue(new Callback<List<Matrice>>() {
-                @Override
-                public void onResponse(Call<List<Matrice>> call, Response<List<Matrice>> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        List<Matrice> matrices = response.body();
-                        executor.execute(() -> {
-                            matriceDao.insertAll(matrices); // Insert the latest Matrices
-                        });
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<Matrice>> call, Throwable t) {
-                    // Handle failure (optional logging)
-                }
-            });
-
-            // Fetch origines from the server
-            apiService.getAllOrigines().enqueue(new Callback<List<Origine>>() {
-                @Override
-                public void onResponse(Call<List<Origine>> call, Response<List<Origine>> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        List<Origine> origines = response.body();
-                        executor.execute(() -> {
-                            origineDao.insertAll(origines); // Insert the latest Origines
-                        });
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<Origine>> call, Throwable t) {
-                    // Handle failure (optional logging)
-                }
-            });
-        } else {
-            // Handle case when network is unavailable
-            Log.e("Repository", "Network unavailable. Cannot update Matrices and Origines.");
-        }
     }
 
     public LiveData<List<EvaluationSiteWithDetails>> getAllEvaluationSites() {
@@ -611,7 +620,7 @@ public class EvaluationSiteRepository {
         });
     }
 
-    // EvaluationSiteRepository.java
+
     public LiveData<Boolean> synchronizeData() {
         MutableLiveData<Boolean> syncResult = new MutableLiveData<>();
 
@@ -625,86 +634,20 @@ public class EvaluationSiteRepository {
             try {
                 Log.d("Repository", "Starting synchronization...");
 
-                // Récupérer les données depuis l'API
-                List<Site> sites = apiService.getAllSites().execute().body();
-                List<Origine> origines = apiService.getAllOrigines().execute().body();
-                List<Matrice> matrices = apiService.getAllMatrices().execute().body();
-                List<EvaluationSiteWithDetailsDTO> evaluationSitesDto = apiService.getAllEvaluationSites().execute().body();
-
-                if (sites == null || origines == null || matrices == null || evaluationSitesDto == null) {
-                    Log.e("Repository", "Failed to fetch some data from API. Aborting synchronization.");
+                // Synchronize pending requests
+                boolean syncPendingSuccess = synchronizePendingRequests();
+                if (!syncPendingSuccess) {
                     syncResult.postValue(false);
                     return;
                 }
 
-                List<EvaluationSite> evaluationSites = new ArrayList<>();
-                List<Evaluation> evaluations = new ArrayList<>();
-                List<Facteur> allFacteurs = new ArrayList<>();
-                List<MatriceFacteur> allMatriceFacteurs = new ArrayList<>();
-                List<Valeur> allValeurs = new ArrayList<>();
+                // Clear the database
+                clearDatabase();
 
-                // Traiter les EvaluationSites et Evaluations
-                for (EvaluationSiteWithDetailsDTO dto : evaluationSitesDto) {
-                    evaluationSites.add(dto.toEvaluationSite());
-                    evaluations.add(dto.getEvaluation().toEvaluation());
-                }
 
-                // Traiter les Facteurs, MatriceFacteurs, et Valeurs
-                for (Matrice matrice : matrices) {
-                    List<MatriceFacteurDto> matriceFacteursDto = apiService.getMatriceFacteursByMatriceId(matrice.getId()).execute().body();
-                    if (matriceFacteursDto != null) {
-                        for (MatriceFacteurDto dto : matriceFacteursDto) {
-                            Facteur facteur = dto.getFacteur();
-                            if (facteur != null) {
-                                allFacteurs.add(facteur);
-
-                                // Ajouter la relation dans MatriceFacteur
-                                MatriceFacteur matriceFacteur = new MatriceFacteur();
-                                matriceFacteur.setMatriceId(matrice.getId());
-                                matriceFacteur.setFacteurId(facteur.getId());
-                                allMatriceFacteurs.add(matriceFacteur);
-
-                                // Récupérer les valeurs pour le facteur
-                                List<Valeur> valeurs = apiService.getValeursByFacteurId(facteur.getId()).execute().body();
-                                if (valeurs != null) {
-                                    for (Valeur valeur : valeurs) {
-                                        valeur.setFacteurId(facteur.getId());
-                                    }
-                                    allValeurs.addAll(valeurs);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Insertion Transactionnelle
-                database.runInTransaction(() -> {
-                    try {
-                        Log.d("Repository", "Inserting data into local database...");
-
-                        // Insérer les données principales
-                        database.siteDao().insertAll(sites);
-                        database.origineDao().insertAll(origines);
-                        database.matriceDao().insertAll(matrices);
-
-                        // Insérer les facteurs, relations MatriceFacteur, et valeurs
-                        database.facteurDao().insertAll(allFacteurs);
-                        database.matriceFacteurDao().insertAll(allMatriceFacteurs);
-                        database.valeurDao().insertAll(allValeurs);
-
-                        // Insérer les évaluations et les relations site-évaluation
-                        database.evaluationDao().insertAll(evaluations);
-                        database.evaluationSiteDao().insertAll(evaluationSites);
-
-                        Log.d("Repository", "Data successfully inserted into local database.");
-                    } catch (Exception e) {
-                        Log.e("Repository", "Error during database insertion", e);
-                        throw e; // Annule la transaction
-                    }
-                });
-
-                Log.d("Repository", "Synchronization completed successfully.");
-                syncResult.postValue(true);
+                // Import data from API
+                boolean importSuccess = importDataFromApi();
+                syncResult.postValue(importSuccess);
             } catch (Exception e) {
                 Log.e("Repository", "Error during synchronization", e);
                 syncResult.postValue(false);
@@ -712,6 +655,178 @@ public class EvaluationSiteRepository {
         });
 
         return syncResult;
+    }
+
+    private void clearDatabase() {
+        executor.execute(() -> {
+            try {
+                database.evaluationSiteDao().clearAll();
+                database.evaluationDao().clearAll();
+                database.siteDao().clearAll();
+                database.matriceDao().clearAll();
+                database.origineDao().clearAll();
+                database.facteurDao().clearAll();
+                database.valeurDao().clearAll();
+                database.matriceFacteurDao().clearAll();
+                Log.d("Repository", "Database cleared successfully.");
+            } catch (Exception e) {
+                Log.e("Repository", "Error clearing database", e);
+            }
+        });
+    }
+
+    private boolean importDataFromApi() {
+        try {
+            // Fetch data from API
+            List<Site> sites = apiService.getAllSites().execute().body();
+            List<Origine> origines = apiService.getAllOrigines().execute().body();
+            List<Matrice> matrices = apiService.getAllMatrices().execute().body();
+            List<EvaluationSiteWithDetailsDTO> evaluationSitesDto = apiService.getAllEvaluationSites().execute().body();
+
+            if (sites == null || origines == null || matrices == null || evaluationSitesDto == null) {
+                Log.e("Repository", "Failed to fetch some data from API. Aborting synchronization.");
+                return false;
+            }
+
+            List<EvaluationSite> evaluationSites = new ArrayList<>();
+            List<Evaluation> evaluations = new ArrayList<>();
+            List<Facteur> allFacteurs = new ArrayList<>();
+            List<MatriceFacteur> allMatriceFacteurs = new ArrayList<>();
+            List<Valeur> allValeurs = new ArrayList<>();
+
+            // Process EvaluationSites and Evaluations
+            for (EvaluationSiteWithDetailsDTO dto : evaluationSitesDto) {
+                evaluationSites.add(dto.toEvaluationSite());
+                evaluations.add(dto.getEvaluation().toEvaluation());
+            }
+
+            // Process Facteurs, MatriceFacteurs, and Valeurs
+            for (Matrice matrice : matrices) {
+                List<MatriceFacteurDto> matriceFacteursDto = apiService.getMatriceFacteursByMatriceId(matrice.getId()).execute().body();
+                if (matriceFacteursDto != null) {
+                    for (MatriceFacteurDto dto : matriceFacteursDto) {
+                        Facteur facteur = dto.getFacteur();
+                        if (facteur != null) {
+                            allFacteurs.add(facteur);
+
+                            // Add relation in MatriceFacteur
+                            MatriceFacteur matriceFacteur = new MatriceFacteur();
+                            matriceFacteur.setMatriceId(matrice.getId());
+                            matriceFacteur.setFacteurId(facteur.getId());
+                            allMatriceFacteurs.add(matriceFacteur);
+
+                            // Fetch values for the facteur
+                            List<Valeur> valeurs = apiService.getValeursByFacteurId(facteur.getId()).execute().body();
+                            if (valeurs != null) {
+                                for (Valeur valeur : valeurs) {
+                                    valeur.setFacteurId(facteur.getId());
+                                }
+                                allValeurs.addAll(valeurs);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Transactional Insertion
+            database.runInTransaction(() -> {
+                try {
+                    Log.d("Repository", "Inserting data into local database...");
+
+                    // Insert main data
+                    database.siteDao().insertAll(sites);
+                    database.origineDao().insertAll(origines);
+                    database.matriceDao().insertAll(matrices);
+
+                    // Insert facteurs, matriceFacteurs, and valeurs
+                    database.facteurDao().insertAll(allFacteurs);
+                    database.matriceFacteurDao().insertAll(allMatriceFacteurs);
+                    database.valeurDao().insertAll(allValeurs);
+
+                    // Insert evaluations and site-evaluation relations
+                    database.evaluationDao().insertAll(evaluations);
+                    database.evaluationSiteDao().insertAll(evaluationSites);
+
+                    Log.d("Repository", "Data successfully inserted into local database.");
+                } catch (Exception e) {
+                    Log.e("Repository", "Error during database insertion", e);
+                    throw e; // Rollback transaction
+                }
+            });
+
+            return true;
+        } catch (Exception e) {
+            Log.e("Repository", "Error during data import", e);
+            return false;
+        }
+    }
+
+    private boolean synchronizePendingRequests() {
+        try {
+            List<PendingRequest> pendingRequests = database.pendingRequestDao().getAll();
+
+            for (PendingRequest request : pendingRequests) {
+                try {
+                    // Refresh tokens before each request
+                    tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
+                        @Override
+                        public void onTokensRefreshed() {
+                            executor.execute(() -> {
+                                try {
+                                    switch (request.getType()) {
+                                        case "CREATE":
+                                            Log.d("Repository", "Processing CREATE request for EvaluationSite");
+                                            EvaluationSiteWithDetailsDTO evaluationSite =
+                                                    new Gson().fromJson(request.getPayload(), EvaluationSiteWithDetailsDTO.class);
+                                            Call<EvaluationSiteWithDetailsDTO> createCall = apiService.createEvaluationSite(evaluationSite);
+                                            Response<EvaluationSiteWithDetailsDTO> createResponse = createCall.execute();
+                                            if (!createResponse.isSuccessful()) {
+                                                Log.e("Repository", "Create request failed with code: " + createResponse.code());
+                                                throw new Exception("Create request failed with code: " + createResponse.code());
+                                            }
+                                            Log.d("Repository", "CREATE request successful for EvaluationSite");
+                                            break;
+
+                                        case "DELETE":
+                                            Log.d("Repository", "Processing DELETE request for EvaluationSite with ID: " + request.getEntityId());
+                                            Call<Void> deleteCall = apiService.deleteEvaluationSite(request.getEntityId());
+                                            Response<Void> deleteResponse = deleteCall.execute();
+                                            if (!deleteResponse.isSuccessful()) {
+                                                Log.e("Repository", "Delete request failed with code: " + deleteResponse.code());
+                                                throw new Exception("Delete request failed with code: " + deleteResponse.code());
+                                            }
+                                            Log.d("Repository", "DELETE request successful for EvaluationSite with ID: " + request.getEntityId());
+                                            break;
+                                    }
+
+                                    // If successful, delete the request from the queue
+                                    database.pendingRequestDao().deleteById(request.getId());
+                                } catch (Exception e) {
+                                    Log.e("Repository", "Error synchronizing request: " + request.getEntityType(), e);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Log.e("Repository", "Token refresh failed for request: " + request.getEntityType());
+                        }
+                    });
+
+                    // Wait for token refresh to complete
+                    synchronized (tokenRefresherRepository) {
+                        tokenRefresherRepository.wait();
+                    }
+                } catch (Exception e) {
+                    Log.e("Repository", "Error synchronizing request: " + request.getEntityType(), e);
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            Log.e("Repository", "Error fetching pending requests", e);
+            return false;
+        }
     }
 
     private boolean isNetworkAvailable() {

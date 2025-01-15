@@ -22,4 +22,7 @@ public interface MatriceFacteurDao {
 
     @Query("SELECT * FROM matrices WHERE id IN (SELECT matriceId FROM MatriceFacteur WHERE facteurId = :facteurId)")
     List<Matrice> getMatricesByFacteurId(long facteurId);
+
+    @Query("DELETE FROM MatriceFacteur")
+    void clearAll();
 }

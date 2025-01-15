@@ -28,5 +28,8 @@ public interface FacteurDao {
 
     @Query("SELECT * FROM facteurs WHERE id = :facteurId")
     Facteur getFacteurById(long facteurId);
+
+    @Query("DELETE FROM facteurs")
+    void clearAll();
 }
 

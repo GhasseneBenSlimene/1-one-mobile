@@ -14,6 +14,7 @@ import com.example.one_mobile.data.local.Dao.FacteurDao;
 import com.example.one_mobile.data.local.Dao.MatriceDao;
 import com.example.one_mobile.data.local.Dao.MatriceFacteurDao;
 import com.example.one_mobile.data.local.Dao.OrigineDao;
+import com.example.one_mobile.data.local.Dao.PendingRequestDao;
 import com.example.one_mobile.data.local.Dao.SiteDao;
 import com.example.one_mobile.data.local.Dao.ValeurDao;
 import com.example.one_mobile.data.model.Evaluation;
@@ -22,6 +23,7 @@ import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.MatriceFacteur;
 import com.example.one_mobile.data.model.Origine;
+import com.example.one_mobile.data.model.PendingRequest;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
 
@@ -33,8 +35,9 @@ import com.example.one_mobile.data.model.Valeur;
         Evaluation.class,
         Facteur.class,
         MatriceFacteur.class,
-        Valeur.class
-}, version = 7, exportSchema = false)
+        Valeur.class,
+        PendingRequest.class
+}, version = 8, exportSchema = false)
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase instance;
@@ -47,6 +50,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract FacteurDao facteurDao();
     public abstract MatriceFacteurDao matriceFacteurDao();
     public abstract ValeurDao valeurDao();
+    public abstract PendingRequestDao pendingRequestDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
