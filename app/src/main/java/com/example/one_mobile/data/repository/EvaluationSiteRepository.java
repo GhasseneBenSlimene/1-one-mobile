@@ -33,6 +33,7 @@ import com.example.one_mobile.data.network.RetrofitClient;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -78,25 +79,38 @@ public class EvaluationSiteRepository {
             executor.execute(() -> {
                 try {
                     // Convert DTO to entities
+                    Log.d("createEvaluationSite", "Converting EvaluationSiteWithDetailsDTO to entities...");
                     EvaluationSite evaluationSiteEntity = evaluationSite.toEvaluationSite();
                     Site siteEntity = evaluationSite.getSite();
                     Evaluation evaluationEntity = evaluationSite.getEvaluation().toEvaluation();
+                    Log.d("createEvaluationSite", "Conversion successful: EvaluationSite, Site, and Evaluation entities created.");
 
-                    // Insert entities into the local database
-                    database.siteDao().insert(siteEntity);
-                    database.evaluationDao().insert(evaluationEntity);
-                    database.evaluationSiteDao().insert(evaluationSiteEntity);
+                    try {
+                        // Insert entities into the local database
+                        Log.d("createEvaluationSite", "Inserting Site entity into the database...");
+                        database.siteDao().insert(siteEntity);
+                        Log.d("createEvaluationSite", "Site entity inserted successfully.");
 
+                        Log.d("createEvaluationSite", "Inserting Evaluation entity into the database...");
+                        database.evaluationDao().insert(evaluationEntity);
+                        Log.d("createEvaluationSite", "Evaluation entity inserted successfully.");
+
+                        Log.d("createEvaluationSite", "Inserting EvaluationSite entity into the database...");
+                        database.evaluationSiteDao().insert(evaluationSiteEntity);
+                        Log.d("createEvaluationSite", "EvaluationSite entity inserted successfully.");
+                    } catch (Exception e) {
+                        Log.e("createEvaluationSite", "Error inserting entities into the database", e);
+                    }
                     PendingRequest pendingRequest = new PendingRequest();
                     pendingRequest.setType("CREATE");
                     pendingRequest.setEntityType("EvaluationSite");
                     pendingRequest.setPayload(new Gson().toJson(evaluationSite));
                     pendingRequest.setTimestamp(System.currentTimeMillis());
                     database.pendingRequestDao().insert(pendingRequest);
-                    Log.d("Repository", "Requête CREATE ajoutée à la file d'attente.");
+                    Log.d("createEvaluationSite", "Requête CREATE ajoutée à la file d'attente.");
                     createdEvaluationSite.postValue(evaluationSite); // Mettez à jour localement
                 } catch (Exception e) {
-                    Log.e("Repository", "Erreur lors de l'ajout à la file d'attente", e);
+                    Log.e("createEvaluationSite", "Erreur lors de l'ajout à la file d'attente", e);
                     createdEvaluationSite.postValue(null);
                 }
             });
@@ -629,6 +643,10 @@ public class EvaluationSiteRepository {
     private void loadLocalData(MutableLiveData<List<EvaluationSiteWithDetails>> liveData) {
         executor.execute(() -> {
             List<EvaluationSiteWithDetails> localData = database.evaluationSiteDao().getAllEvaluationSitesWithDetailsSync();
+            // show all data in log
+            for (EvaluationSiteWithDetails evaluationSiteWithDetails : localData) {
+                Log.d("loadLocalData", "EvaluationSiteWithDetails: " + evaluationSiteWithDetails.toString());
+            }
             liveData.postValue(localData);
         });
     }
@@ -813,6 +831,9 @@ public class EvaluationSiteRepository {
     private boolean synchronizePendingRequests() {
         try {
             List<PendingRequest> pendingRequests = database.pendingRequestDao().getAll();
+
+            // Sort the requests by timestamp
+            pendingRequests.sort(Comparator.comparingLong(PendingRequest::getTimestamp));
 
             for (PendingRequest request : pendingRequests) {
                 boolean requestProcessed = processSinglePendingRequestWithTokenRefresh(request);
