@@ -118,6 +118,7 @@ public class EvaluationDTO {
         evaluation.setId(this.getId());
         evaluation.setOrigineId(this.getOrigine() != null ? this.getOrigine().getId() : null);
         evaluation.setMatriceId(this.getMatrice() != null ? this.getMatrice().getId() : 0);
+        evaluation.setRisqueId(this.getRisque() != null ? this.getRisque().getId() : 0);
         evaluation.setIndice(this.getIndice());
         evaluation.setIndiceInt(this.getIndiceInt());
         evaluation.setDesc(this.getDesc());

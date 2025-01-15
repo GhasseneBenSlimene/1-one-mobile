@@ -239,23 +239,52 @@ public class EvaluationSiteRepository {
     }
 
     public LiveData<List<Risque>> getAllRisques() {
-        MutableLiveData<List<Risque>> risques = new MutableLiveData<>();
-        apiService.getAllRisques().enqueue(new Callback<List<Risque>>() {
-            @Override
-            public void onResponse(Call<List<Risque>> call, Response<List<Risque>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    risques.setValue(response.body());
-                } else {
-                    risques.setValue(null);
-                }
-            }
+        MutableLiveData<List<Risque>> liveData = new MutableLiveData<>();
 
-            @Override
-            public void onFailure(Call<List<Risque>> call, Throwable t) {
-                risques.setValue(null);
-            }
+        if (isNetworkAvailable()) {
+            apiService.getAllRisques().enqueue(new Callback<List<Risque>>() {
+                @Override
+                public void onResponse(Call<List<Risque>> call, Response<List<Risque>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Risque> risques = response.body();
+
+                        executor.execute(() -> {
+                            try {
+                                database.risqueDao().insertAll(risques); // Insert or update
+                                Log.d("Repository", "Risques inserted/updated successfully.");
+                            } catch (Exception e) {
+                                Log.e("Repository", "Error inserting/updating Risques", e);
+                            }
+
+                            // Load data from the database after insert/update
+                            List<Risque> localRisques = database.risqueDao().getAllRisques();
+                            liveData.postValue(localRisques);
+                        });
+                    } else {
+                        Log.e("Repository", "API response for Risques unsuccessful.");
+                        loadRisquesFromLocalDatabase(liveData);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Risque>> call, Throwable t) {
+                    Log.e("Repository", "Failed to fetch Risques from API", t);
+                    loadRisquesFromLocalDatabase(liveData);
+                }
+            });
+        } else {
+            Log.d("Repository", "No network available, loading Risques from local database.");
+            loadRisquesFromLocalDatabase(liveData);
+        }
+
+        return liveData;
+    }
+
+    private void loadRisquesFromLocalDatabase(MutableLiveData<List<Risque>> liveData) {
+        executor.execute(() -> {
+            List<Risque> localRisques = database.risqueDao().getAllRisques();
+            liveData.postValue(localRisques);
         });
-        return risques;
     }
 
     public LiveData<List<Origine>> getAllOrigines() {
@@ -547,50 +576,34 @@ public class EvaluationSiteRepository {
                         List<Origine> origines = new ArrayList<>();
                         List<Site> sites = new ArrayList<>();
                         List<Evaluation> evaluations = new ArrayList<>();
-
-                        Log.d("EvaluationSiteRepository", "API response received, processing DTOs...");
+                        List<Risque> risques = new ArrayList<>();
 
                         for (EvaluationSiteWithDetailsDTO dto : dtoList) {
-                            try {
-                                // Log raw DTO data
-                                Log.d("EvaluationSiteRepository", "Processing DTO: " + dto);
-
-                                // Map DTO to model and add to respective lists
-                                evaluationSites.add(dto.toEvaluationSite());
-                                evaluations.add(dto.getEvaluation().toEvaluation());
-                                matrices.add(dto.getEvaluation().getMatrice());
-                                if (dto.getEvaluation().getOrigine() != null) {
-                                    origines.add(dto.getEvaluation().getOrigine());
-                                }
-                                sites.add(dto.getSite());
-                            } catch (Exception e) {
-                                Log.e("EvaluationSiteRepository", "Error processing DTO: " + dto, e);
+                            evaluationSites.add(dto.toEvaluationSite());
+                            evaluations.add(dto.getEvaluation().toEvaluation());
+                            matrices.add(dto.getEvaluation().getMatrice());
+                            if (dto.getEvaluation().getOrigine() != null) {
+                                origines.add(dto.getEvaluation().getOrigine());
+                            }
+                            sites.add(dto.getSite());
+                            if (dto.getEvaluation().getRisque() != null) {
+                                risques.add(dto.getEvaluation().getRisque());
                             }
                         }
 
-                        // Save data to the local database
                         executor.execute(() -> {
                             try {
-                                Log.d("EvaluationSiteRepository", "Inserting data into local database...");
-
                                 database.matriceDao().insertAll(matrices);
                                 database.origineDao().insertAll(origines);
                                 database.siteDao().insertAll(sites);
                                 database.evaluationDao().insertAll(evaluations);
                                 database.evaluationSiteDao().insertAll(evaluationSites);
+                                database.risqueDao().insertAll(risques);
 
-                                Log.d("EvaluationSiteRepository", "Data successfully inserted into local database.");
-                            } catch (Exception e) {
-                                Log.e("EvaluationSiteRepository", "Error inserting data into local database", e);
-                            }
-
-                            // Load updated data from local database
-                            try {
                                 List<EvaluationSiteWithDetails> details = database.evaluationSiteDao().getAllEvaluationSitesWithDetailsSync();
-                                Log.d("EvaluationSiteRepository", "Loaded details from local database: " + details);
                                 liveData.postValue(details);
                             } catch (Exception e) {
-                                Log.e("EvaluationSiteRepository", "Error loading details from local database", e);
+                                Log.e("EvaluationSiteRepository", "Error inserting data into local database", e);
                             }
                         });
                     } else {
@@ -634,7 +647,8 @@ public class EvaluationSiteRepository {
             try {
                 Log.d("Repository", "Starting synchronization...");
 
-                // Étape 1 : Synchroniser les requêtes en attente
+                // Step 1: Synchronize pending requests
+                Log.d("Repository", "Starting synchronizePendingRequests...");
                 boolean syncPendingSuccess = synchronizePendingRequests();
                 if (!syncPendingSuccess) {
                     syncResult.postValue(false);
@@ -644,7 +658,8 @@ public class EvaluationSiteRepository {
                 // Étape 2 : Nettoyer la base locale
                 clearDatabase();
 
-                // Étape 3 : Importer les données depuis l'API
+                // Step 3: Import data from the API
+                Log.d("Repository", "Starting importDataFromApi...");
                 boolean importSuccess = importDataFromApi();
                 if (!importSuccess) {
                     syncResult.postValue(false);
@@ -664,22 +679,47 @@ public class EvaluationSiteRepository {
 
 
     private void clearDatabase() {
-        executor.execute(() -> {
-            try {
-                database.evaluationSiteDao().clearAll();
-                database.evaluationDao().clearAll();
-                database.siteDao().clearAll();
-                database.matriceDao().clearAll();
-                database.origineDao().clearAll();
-                database.facteurDao().clearAll();
-                database.valeurDao().clearAll();
-                database.matriceFacteurDao().clearAll();
-                database.pendingRequestDao().clearAll();
-                Log.d("Repository", "Database cleared successfully.");
-            } catch (Exception e) {
-                Log.e("Repository", "Error clearing database", e);
-            }
-        });
+        try {
+            Log.d("Repository", "Clearing evaluationSiteDao...");
+            database.evaluationSiteDao().clearAll();
+            Log.d("Repository", "evaluationSiteDao cleared.");
+
+            Log.d("Repository", "Clearing evaluationDao...");
+            database.evaluationDao().clearAll();
+            Log.d("Repository", "evaluationDao cleared.");
+
+            Log.d("Repository", "Clearing siteDao...");
+            database.siteDao().clearAll();
+            Log.d("Repository", "siteDao cleared.");
+
+            Log.d("Repository", "Clearing matriceDao...");
+            database.matriceDao().clearAll();
+            Log.d("Repository", "matriceDao cleared.");
+
+            Log.d("Repository", "Clearing origineDao...");
+            database.origineDao().clearAll();
+            Log.d("Repository", "origineDao cleared.");
+
+            Log.d("Repository", "Clearing facteurDao...");
+            database.facteurDao().clearAll();
+            Log.d("Repository", "facteurDao cleared.");
+
+            Log.d("Repository", "Clearing valeurDao...");
+            database.valeurDao().clearAll();
+            Log.d("Repository", "valeurDao cleared.");
+
+            Log.d("Repository", "Clearing matriceFacteurDao...");
+            database.matriceFacteurDao().clearAll();
+            Log.d("Repository", "matriceFacteurDao cleared.");
+
+            Log.d("Repository", "Clearing pendingRequestDao...");
+            database.pendingRequestDao().clearAll();
+            Log.d("Repository", "pendingRequestDao cleared.");
+
+            Log.d("Repository", "Database cleared successfully.");
+        } catch (Exception e) {
+            Log.e("Repository", "Error clearing database", e);
+        }
     }
 
     private boolean importDataFromApi() {
@@ -689,8 +729,9 @@ public class EvaluationSiteRepository {
             List<Origine> origines = apiService.getAllOrigines().execute().body();
             List<Matrice> matrices = apiService.getAllMatrices().execute().body();
             List<EvaluationSiteWithDetailsDTO> evaluationSitesDto = apiService.getAllEvaluationSites().execute().body();
+            List<Risque> risques = apiService.getAllRisques().execute().body();
 
-            if (sites == null || origines == null || matrices == null || evaluationSitesDto == null) {
+            if (sites == null || origines == null || matrices == null || evaluationSitesDto == null || risques == null) {
                 Log.e("Repository", "Failed to fetch some data from API. Aborting synchronization.");
                 return false;
             }
@@ -744,6 +785,7 @@ public class EvaluationSiteRepository {
                     database.siteDao().insertAll(sites);
                     database.origineDao().insertAll(origines);
                     database.matriceDao().insertAll(matrices);
+                    database.risqueDao().insertAll(risques);
 
                     // Insert facteurs, matriceFacteurs, and valeurs
                     database.facteurDao().insertAll(allFacteurs);

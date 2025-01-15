@@ -25,6 +25,8 @@ public class Evaluation {
 
     @ColumnInfo(name = "matrice_id")
     private long matriceId;
+    @ColumnInfo(name = "risque_id")
+    private long risqueId;
     private float indice;
     private int indiceInt;
     private String desc;
@@ -57,7 +59,12 @@ public class Evaluation {
     public void setMatriceId(long matriceId) {
         this.matriceId = matriceId;
     }
-
+    public long getRisqueId() {
+        return risqueId;
+    }
+    public void setRisqueId(long risqueId) {
+        this.risqueId = risqueId;
+    }
     public float getIndice() {
         return indice;
     }
