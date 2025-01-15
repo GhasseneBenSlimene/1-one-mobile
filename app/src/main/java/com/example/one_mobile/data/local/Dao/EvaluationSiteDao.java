@@ -41,6 +41,10 @@ public interface EvaluationSiteDao {
     @Query("SELECT * FROM evaluation_sites")
     List<EvaluationSite> getAllEvaluationSitesSync();
 
+    // Get a specific EvaluationSite by ID
+    @Query("SELECT * FROM evaluation_sites WHERE id = :evaluationSiteId")
+    EvaluationSite getEvaluationSiteById(long evaluationSiteId);
+
     // Clear all EvaluationSites
     @Query("DELETE FROM evaluation_sites")
     void clearAll();

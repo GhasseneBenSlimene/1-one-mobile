@@ -1,5 +1,6 @@
 package com.example.one_mobile.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,7 +70,11 @@ public class EvaluationDetailsDialog extends DialogFragment {
         Button cancelButton = view.findViewById(R.id.button_cancel);
 
         modifyButton.setOnClickListener(v -> {
-            if (listener != null) listener.onModify(evaluationSite);
+            if (listener != null) {
+                Intent intent = new Intent(getContext(), EvaluationSiteUpdateForm.class);
+                intent.putExtra("evaluationSiteId", evaluationSite.getEvaluationSite().getId());
+                startActivity(intent);
+            }
             dismiss();
         });
 

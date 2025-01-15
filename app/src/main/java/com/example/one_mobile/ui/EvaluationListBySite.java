@@ -47,7 +47,6 @@ public class EvaluationListBySite extends AppCompatActivity {
     private void populateTable(List<EvaluationSiteWithDetails> evaluationSites) {
         if (evaluationSites == null || evaluationSites.isEmpty()) {
             Toast.makeText(this, "Aucune évaluation trouvée", Toast.LENGTH_SHORT).show();
-            return;
         }
 
         RecyclerView recyclerView = findViewById(R.id.recycler_evaluation_risque);

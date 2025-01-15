@@ -4,11 +4,9 @@ import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
 import com.example.one_mobile.data.local.Dto.MatriceFacteurDto;
 import com.example.one_mobile.data.model.AuthResponse;
 import com.example.one_mobile.data.model.AuthenticationRequest;
-import com.example.one_mobile.data.model.EvaluationValeur;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.Origine;
-import com.example.one_mobile.data.model.RiskEvaluation;
 import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
@@ -22,17 +20,8 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 public interface ApiService {
-    @GET("risks/sync")
-    Call<List<RiskEvaluation>> getModifiedRisks(@Query("lastSync") String lastSyncTimestamp);
-
-    @POST("risks")
-    Call<RiskEvaluation> addRisk(@Body RiskEvaluation risk);
-
-    @PUT("risks")
-    Call<Void> updateRisk(@Body RiskEvaluation risk);
 
     // Authentication
     @GET("/auth/openSession")
@@ -59,6 +48,8 @@ public interface ApiService {
     Call<EvaluationSiteWithDetailsDTO> createEvaluationSite(
             @Body EvaluationSiteWithDetailsDTO evaluationSite
     );
+    @PUT("/evaluationSite/{id}")
+    Call<EvaluationSiteWithDetailsDTO> updateEvaluationSite(@Path("id") long id, @Body EvaluationSiteWithDetailsDTO evaluationSite);
 
     @DELETE("/evaluationSite/{id}")
     Call<Void> deleteEvaluationSite(@Path("id") long evaluationSiteId);
@@ -98,11 +89,4 @@ public interface ApiService {
 
     @GET("/valeurByFacteur/{id}")
     Call<List<Valeur>> getValeursByFacteurId(@Path("id") long facteurId);
-
-    // EvaluationValeur
-    @POST("/evaluationValeur/")
-    Call<EvaluationValeur> createEvaluationValeur(@Body EvaluationValeur evaluationValeur);
-
-    @GET("/evaluationValeur/evaluation/{id}")
-    Call<List<EvaluationValeur>> getEvaluationValeursByEvaluationId(@Path("id") long evaluationId);
 }

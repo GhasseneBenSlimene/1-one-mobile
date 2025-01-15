@@ -61,6 +61,9 @@ public class EvaluationSiteAdapter extends RecyclerView.Adapter<EvaluationSiteAd
     }
 
     private String getShortDescription(String desc) {
+        if (desc == null) {
+            return "";
+        }
         return desc.length() > 30 ? desc.substring(0, 30) + "..." : desc;
     }
 

@@ -350,6 +350,15 @@ public class EvaluationSiteRepository {
         });
     }
 
+    public LiveData<EvaluationSite> loadEvaluationSiteByIdFromLocalDatabase(long evaluationSiteId) {
+        MutableLiveData<EvaluationSite> liveData = new MutableLiveData<>();
+        executor.execute(() -> {
+            EvaluationSite localEvaluationSite = database.evaluationSiteDao().getEvaluationSiteById(evaluationSiteId);
+            liveData.postValue(localEvaluationSite);
+        });
+        return liveData;
+    }
+
     public LiveData<List<Matrice>> getAllMatrices() {
         MutableLiveData<List<Matrice>> liveData = new MutableLiveData<>();
 
@@ -576,6 +585,115 @@ public class EvaluationSiteRepository {
         });
     }
 
+
+    public LiveData<EvaluationSiteWithDetailsDTO> createEvaluationSite(EvaluationSiteWithDetailsDTO evaluationSite) {
+        MutableLiveData<EvaluationSiteWithDetailsDTO> createdEvaluationSite = new MutableLiveData<>();
+
+        tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
+            @Override
+            public void onTokensRefreshed() {
+                apiService.createEvaluationSite(evaluationSite).enqueue(new Callback<EvaluationSiteWithDetailsDTO>() {
+                    @Override
+                    public void onResponse(Call<EvaluationSiteWithDetailsDTO> call, Response<EvaluationSiteWithDetailsDTO> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            createdEvaluationSite.setValue(response.body());
+                        } else {
+                            createdEvaluationSite.setValue(null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<EvaluationSiteWithDetailsDTO> call, Throwable t) {
+                        createdEvaluationSite.setValue(null);
+                        t.printStackTrace();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                createdEvaluationSite.setValue(null);
+            }
+
+        });
+        return createdEvaluationSite;
+    }
+
+    public LiveData<EvaluationSiteWithDetailsDTO> updateEvaluationSite(long id, EvaluationSiteWithDetailsDTO evaluationSite) {
+        MutableLiveData<EvaluationSiteWithDetailsDTO> updatedEvaluationSite = new MutableLiveData<>();
+
+        tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
+            @Override
+            public void onTokensRefreshed() {
+                apiService.updateEvaluationSite(id, evaluationSite).enqueue(new Callback<EvaluationSiteWithDetailsDTO>() {
+                    @Override
+                    public void onResponse(Call<EvaluationSiteWithDetailsDTO> call, Response<EvaluationSiteWithDetailsDTO> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            updatedEvaluationSite.setValue(response.body());
+                        } else {
+                            updatedEvaluationSite.setValue(null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<EvaluationSiteWithDetailsDTO> call, Throwable t) {
+                        updatedEvaluationSite.setValue(null);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+                updatedEvaluationSite.setValue(null);
+            }
+        });
+
+        return updatedEvaluationSite;
+    }
+
+    public void updateMatricesAndOrigines() {
+        if (isNetworkAvailable()) {
+            // Fetch matrices from the server
+            apiService.getAllMatrices().enqueue(new Callback<List<Matrice>>() {
+                @Override
+                public void onResponse(Call<List<Matrice>> call, Response<List<Matrice>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Matrice> matrices = response.body();
+                        executor.execute(() -> {
+                            matriceDao.insertAll(matrices); // Insert the latest Matrices
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Matrice>> call, Throwable t) {
+                    // Handle failure (optional logging)
+                }
+            });
+
+            // Fetch origines from the server
+            apiService.getAllOrigines().enqueue(new Callback<List<Origine>>() {
+                @Override
+                public void onResponse(Call<List<Origine>> call, Response<List<Origine>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Origine> origines = response.body();
+                        executor.execute(() -> {
+                            origineDao.insertAll(origines); // Insert the latest Origines
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Origine>> call, Throwable t) {
+                    // Handle failure (optional logging)
+                }
+            });
+        } else {
+            // Handle case when network is unavailable
+            Log.e("Repository", "Network unavailable. Cannot update Matrices and Origines.");
+        }
+    }
+
     public LiveData<List<EvaluationSiteWithDetails>> getAllEvaluationSites() {
         MutableLiveData<List<EvaluationSiteWithDetails>> liveData = new MutableLiveData<>();
 
@@ -611,6 +729,7 @@ public class EvaluationSiteRepository {
                                 database.origineDao().insertAll(origines);
                                 database.siteDao().insertAll(sites);
                                 database.evaluationDao().insertAll(evaluations);
+                                database.evaluationSiteDao().clearAll();
                                 database.evaluationSiteDao().insertAll(evaluationSites);
                                 database.risqueDao().insertAll(risques);
 
