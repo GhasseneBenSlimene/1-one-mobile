@@ -949,7 +949,7 @@ public class EvaluationSiteRepository {
     }
     public boolean clearDatabaseSync() {
         try {
-            evaluationSiteDao.clearAll();
+            clearDatabase();
             return true;
         } catch (Exception e) {
             return false;
