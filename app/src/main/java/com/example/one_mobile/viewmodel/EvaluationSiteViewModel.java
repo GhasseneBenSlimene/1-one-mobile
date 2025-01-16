@@ -53,6 +53,11 @@ public class EvaluationSiteViewModel extends ViewModel {
         return repository.getEvaluationSiteWithDetailsDTOById(evaluationSiteId);
     }
 
+
+    public boolean clearDatabaseSync() {
+        return repository.clearDatabaseSync();
+    }
+
     // Gestion des Sites
     public LiveData<List<Site>> getAllSites() {
         return repository.getAllSites();

@@ -947,6 +947,14 @@ public class EvaluationSiteRepository {
         }
         return null;
     }
+    public boolean clearDatabaseSync() {
+        try {
+            evaluationSiteDao.clearAll();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     private boolean importDataFromApi() {
         try {

@@ -23,18 +23,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
-        EvaluationSiteViewModel evaluationSiteViewModel = new ViewModelProvider(this).get(EvaluationSiteViewModel.class);
-
-        Button clearDatabaseButton = findViewById(R.id.clearDatabaseButton);
-        clearDatabaseButton.setOnClickListener(v -> {
-            evaluationSiteViewModel.clearDatabase().observe(this, isCleared -> {
-                if (isCleared) {
-                    Toast.makeText(this, "Database cleared successfully!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Failed to clear database", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
     }
 
     @Override
@@ -46,7 +34,6 @@ public class BaseActivity extends AppCompatActivity {
 
     private void setupToolbar() {
         SharedPreferences preferences = getSharedPreferences("userPrefs", MODE_PRIVATE);
-        String username = preferences.getString("username", "Utilisateur");
 
         Button homeButton = findViewById(R.id.homeButton);
         homeButton.setOnClickListener(v -> {
@@ -72,18 +59,20 @@ public class BaseActivity extends AppCompatActivity {
 
         Button syncButton = findViewById(R.id.syncButton);
         syncButton.setOnClickListener(v -> syncData());
+
+        Button clearDatabaseButton = findViewById(R.id.clearDatabaseButton);
+        clearDatabaseButton.setOnClickListener(v -> clearDatabase());
     }
 
     @Override
     public void onBackPressed() {
-        // Navigate to the home screen instead of going back to AuthActivity
         super.onBackPressed();
         Intent intent = new Intent(this, Home.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
-    
+
     private void syncData() {
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Synchronisation en cours...");
@@ -101,5 +90,21 @@ public class BaseActivity extends AppCompatActivity {
                 Toast.makeText(this, "Échec de la synchronisation", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void clearDatabase() {
+        EvaluationSiteViewModelFactory factory = new EvaluationSiteViewModelFactory(this);
+        EvaluationSiteViewModel viewModel = new ViewModelProvider(this, factory).get(EvaluationSiteViewModel.class);
+
+        new Thread(() -> {
+            boolean isCleared = viewModel.clearDatabaseSync();
+            runOnUiThread(() -> {
+                if (isCleared) {
+                    Toast.makeText(this, "Database cleared successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Failed to clear database", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
     }
 }
