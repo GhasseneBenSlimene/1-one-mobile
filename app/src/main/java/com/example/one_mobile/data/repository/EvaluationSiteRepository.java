@@ -81,7 +81,10 @@ public class EvaluationSiteRepository {
         executor.execute(() -> {
             try {
                 // Retrieve associated Origine, Matrice, and Risque
-                Origine origine = database.origineDao().getOrigineById(evaluation.getOrigineId());
+                Origine origine = null;
+                if (evaluation.getOrigineId() != null) {
+                    origine = database.origineDao().getOrigineById(evaluation.getOrigineId());
+                }
                 Matrice matrice = database.matriceDao().getMatriceById(evaluation.getMatriceId());
                 Risque risque = database.risqueDao().getRisqueById(evaluation.getRisqueId());
 
@@ -675,6 +678,38 @@ public class EvaluationSiteRepository {
     public LiveData<EvaluationSiteWithDetailsDTO> updateEvaluationSite(long id, EvaluationSiteWithDetailsDTO evaluationSite) {
         MutableLiveData<EvaluationSiteWithDetailsDTO> updatedEvaluationSite = new MutableLiveData<>();
 
+        if (!isNetworkAvailable()) {
+            // Ajouter la requête dans la file d'attente
+            executor.execute(() -> {
+                try {
+                    // Convert DTO to entities
+                    EvaluationSite evaluationSiteEntity = evaluationSite.toEvaluationSite();
+                    Site siteEntity = evaluationSite.getSite();
+                    Evaluation evaluationEntity = evaluationSite.getEvaluation().toEvaluation();
+
+                    // Update entities in the local database
+                    database.siteDao().insert(siteEntity);
+                    database.evaluationDao().insert(evaluationEntity);
+                    database.evaluationSiteDao().insert(evaluationSiteEntity);
+
+                    PendingRequest pendingRequest = new PendingRequest();
+                    pendingRequest.setType("UPDATE");
+                    pendingRequest.setEntityType("EvaluationSite");
+                    pendingRequest.setEntityId(id);
+                    pendingRequest.setPayload(new Gson().toJson(evaluationSite));
+                    pendingRequest.setTimestamp(System.currentTimeMillis());
+                    database.pendingRequestDao().insert(pendingRequest);
+                    Log.d("updateEvaluationSite", "Requête UPDATE ajoutée à la file d'attente.");
+                    updatedEvaluationSite.postValue(evaluationSite); // Mettez à jour localement
+                } catch (Exception e) {
+                    Log.e("updateEvaluationSite", "Erreur lors de l'ajout à la file d'attente", e);
+                    updatedEvaluationSite.postValue(null);
+                }
+            });
+            return updatedEvaluationSite;
+        }
+
+        // Envoyer la requête en ligne
         tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
             @Override
             public void onTokensRefreshed() {
@@ -868,7 +903,7 @@ public class EvaluationSiteRepository {
     }
 
 
-    private void clearDatabase() {
+    public LiveData<Boolean> clearDatabase() {
         try {
             Log.d("Repository", "Clearing evaluationSiteDao...");
             database.evaluationSiteDao().clearAll();
@@ -910,6 +945,7 @@ public class EvaluationSiteRepository {
         } catch (Exception e) {
             Log.e("Repository", "Error clearing database", e);
         }
+        return null;
     }
 
     private boolean importDataFromApi() {
@@ -1021,6 +1057,7 @@ public class EvaluationSiteRepository {
         }
     }
 
+
     private boolean processSinglePendingRequestWithTokenRefresh(PendingRequest request) {
         try {
             // Rafraîchir les tokens
@@ -1056,12 +1093,38 @@ public class EvaluationSiteRepository {
                 case "DELETE":
                     return processDeleteRequest(request);
 
+                case "UPDATE":
+                    return processUpdateRequest(request);
+
                 default:
                     Log.e("Repository", "Unknown request type: " + request.getType());
                     return false;
             }
         } catch (Exception e) {
             Log.e("Repository", "Error processing request with token refresh: " + request.getId(), e);
+            return false;
+        }
+    }
+
+    private boolean processUpdateRequest(PendingRequest request) {
+        try {
+            Log.d("Repository", "Processing UPDATE request for EvaluationSite with ID: " + request.getEntityId());
+            EvaluationSiteWithDetailsDTO evaluationSite =
+                    new Gson().fromJson(request.getPayload(), EvaluationSiteWithDetailsDTO.class);
+
+            Response<EvaluationSiteWithDetailsDTO> updateResponse = apiService.updateEvaluationSite(request.getEntityId(), evaluationSite).execute();
+            if (!updateResponse.isSuccessful()) {
+                Log.e("Repository", "UPDATE request failed with code: " + updateResponse.code());
+                return false;
+            }
+
+            // Supprimer la requête de la file d'attente si elle a été traitée avec succès
+            database.pendingRequestDao().deleteById(request.getId());
+            Log.d("Repository", "UPDATE request successful for EvaluationSite with ID: " + request.getEntityId());
+            return true;
+
+        } catch (Exception e) {
+            Log.e("Repository", "Error processing UPDATE request: " + request.getId(), e);
             return false;
         }
     }

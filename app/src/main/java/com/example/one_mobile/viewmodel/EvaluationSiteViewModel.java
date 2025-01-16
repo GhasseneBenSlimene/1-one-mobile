@@ -41,6 +41,9 @@ public class EvaluationSiteViewModel extends ViewModel {
         return repository.loadEvaluationSiteByIdFromLocalDatabase(evaluationSiteId);
     }
 
+    public LiveData<Boolean> clearDatabase() {
+        return repository.clearDatabase();
+    }
 
     public LiveData<EvaluationDTO> getEvaluationDTOByEvaluation(Evaluation evaluation) {
         return repository.getEvaluationDTOByEvaluation(evaluation);
