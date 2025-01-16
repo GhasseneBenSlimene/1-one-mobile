@@ -3,7 +3,9 @@ package com.example.one_mobile.data.repository;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Looper;
 import android.util.Log;
+import android.os.Handler;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -15,6 +17,7 @@ import com.example.one_mobile.data.local.Dao.MatriceDao;
 import com.example.one_mobile.data.local.Dao.OrigineDao;
 import com.example.one_mobile.data.local.Dao.PendingRequestDao;
 import com.example.one_mobile.data.local.Dao.SiteDao;
+import com.example.one_mobile.data.local.Dto.EvaluationDTO;
 import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
 import com.example.one_mobile.data.local.Dto.MatriceFacteurDto;
 import com.example.one_mobile.data.model.Evaluation;
@@ -71,6 +74,90 @@ public class EvaluationSiteRepository {
         this.context = context;
         tokenRefresherRepository = new TokenRefresherRepository();
     }
+
+    public LiveData<EvaluationDTO> getEvaluationDTOByEvaluation(Evaluation evaluation) {
+        MutableLiveData<EvaluationDTO> liveData = new MutableLiveData<>();
+
+        executor.execute(() -> {
+            try {
+                // Retrieve associated Origine, Matrice, and Risque
+                Origine origine = database.origineDao().getOrigineById(evaluation.getOrigineId());
+                Matrice matrice = database.matriceDao().getMatriceById(evaluation.getMatriceId());
+                Risque risque = database.risqueDao().getRisqueById(evaluation.getRisqueId());
+
+                // Create EvaluationDTO object
+                EvaluationDTO evaluationDTO = new EvaluationDTO();
+                evaluationDTO.setId(evaluation.getId());
+                evaluationDTO.setOrigine(origine);
+                evaluationDTO.setMatrice(matrice);
+                evaluationDTO.setRisque(risque);
+                evaluationDTO.setIndice(evaluation.getIndice());
+                evaluationDTO.setIndiceInt(evaluation.getIndiceInt());
+                evaluationDTO.setDesc(evaluation.getDesc());
+                evaluationDTO.setDescCourt(evaluation.getDescCourt());
+                evaluationDTO.setValide(evaluation.isValide());
+                evaluationDTO.setDate(evaluation.getDate().toString());
+                evaluationDTO.setValid(evaluation.getValid().toString());
+
+                // Post the result
+                liveData.postValue(evaluationDTO);
+            } catch (Exception e) {
+                Log.e("EvaluationSiteRepository", "Error retrieving EvaluationDTO", e);
+                liveData.postValue(null);
+            }
+        });
+
+        return liveData;
+    }
+
+    // In EvaluationSiteRepository.java
+
+    // In EvaluationSiteRepository.java
+
+    public LiveData<EvaluationSiteWithDetailsDTO> getEvaluationSiteWithDetailsDTOById(long evaluationSiteId) {
+        MutableLiveData<EvaluationSiteWithDetailsDTO> liveData = new MutableLiveData<>();
+
+        executor.execute(() -> {
+            try {
+                // Retrieve EvaluationSiteWithDetails from the database
+                EvaluationSiteWithDetails evaluationSiteWithDetails = database.evaluationSiteDao().getEvaluationSiteWithDetailsByIdSync(evaluationSiteId);
+
+                if (evaluationSiteWithDetails != null) {
+                    // Retrieve associated EvaluationDTO
+                    Evaluation evaluation = evaluationSiteWithDetails.getEvaluation();
+                    LiveData<EvaluationDTO> evaluationDTOLiveData = getEvaluationDTOByEvaluation(evaluation);
+
+                    // Post the observation to the main thread
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        evaluationDTOLiveData.observeForever(evaluationDTO -> {
+                            if (evaluationDTO != null) {
+                                // Create EvaluationSiteWithDetailsDTO object
+                                EvaluationSiteWithDetailsDTO evaluationSiteWithDetailsDTO = new EvaluationSiteWithDetailsDTO();
+                                evaluationSiteWithDetailsDTO.setId(evaluationSiteWithDetails.getEvaluationSite().getId());
+                                evaluationSiteWithDetailsDTO.setSite(evaluationSiteWithDetails.getSite());
+                                evaluationSiteWithDetailsDTO.setEvaluation(evaluationDTO);
+
+                                // Post the result
+                                liveData.postValue(evaluationSiteWithDetailsDTO);
+                            } else {
+                                Log.e("EvaluationSiteRepository", "Failed to load EvaluationDTO");
+                                liveData.postValue(null);
+                            }
+                        });
+                    });
+                } else {
+                    Log.e("EvaluationSiteRepository", "Failed to load EvaluationSiteWithDetails");
+                    liveData.postValue(null);
+                }
+            } catch (Exception e) {
+                Log.e("EvaluationSiteRepository", "Error retrieving EvaluationSiteWithDetailsDTO", e);
+                liveData.postValue(null);
+            }
+        });
+
+        return liveData;
+    }
+
     public LiveData<EvaluationSiteWithDetailsDTO> createEvaluationSite(EvaluationSiteWithDetailsDTO evaluationSite) {
         MutableLiveData<EvaluationSiteWithDetailsDTO> createdEvaluationSite = new MutableLiveData<>();
 
@@ -583,40 +670,6 @@ public class EvaluationSiteRepository {
             Facteur localFacteur = database.facteurDao().getFacteurById(facteurId);
             liveData.postValue(localFacteur);
         });
-    }
-
-
-    public LiveData<EvaluationSiteWithDetailsDTO> createEvaluationSite(EvaluationSiteWithDetailsDTO evaluationSite) {
-        MutableLiveData<EvaluationSiteWithDetailsDTO> createdEvaluationSite = new MutableLiveData<>();
-
-        tokenRefresherRepository.refreshTokens(new TokenRefresherRepository.TokenRefreshCallback() {
-            @Override
-            public void onTokensRefreshed() {
-                apiService.createEvaluationSite(evaluationSite).enqueue(new Callback<EvaluationSiteWithDetailsDTO>() {
-                    @Override
-                    public void onResponse(Call<EvaluationSiteWithDetailsDTO> call, Response<EvaluationSiteWithDetailsDTO> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            createdEvaluationSite.setValue(response.body());
-                        } else {
-                            createdEvaluationSite.setValue(null);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<EvaluationSiteWithDetailsDTO> call, Throwable t) {
-                        createdEvaluationSite.setValue(null);
-                        t.printStackTrace();
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure() {
-                createdEvaluationSite.setValue(null);
-            }
-
-        });
-        return createdEvaluationSite;
     }
 
     public LiveData<EvaluationSiteWithDetailsDTO> updateEvaluationSite(long id, EvaluationSiteWithDetailsDTO evaluationSite) {

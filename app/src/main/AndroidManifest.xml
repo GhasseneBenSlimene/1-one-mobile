@@ -35,6 +35,7 @@
         <activity android:name=".ui.ActionPlansByUtr" />
         <activity android:name=".ui.EvaluationUtrForm" />
         <activity android:name=".ui.EvaluationSiteForm" />
+        <activity android:name=".ui.EvaluationSiteUpdateForm" />
 
 
 

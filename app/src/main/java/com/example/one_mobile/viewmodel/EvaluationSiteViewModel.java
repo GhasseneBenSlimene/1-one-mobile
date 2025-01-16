@@ -7,7 +7,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
+import com.example.one_mobile.data.local.Dto.EvaluationDTO;
 import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
+import com.example.one_mobile.data.model.Evaluation;
 import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
 import com.example.one_mobile.data.model.Facteur;
@@ -37,6 +39,15 @@ public class EvaluationSiteViewModel extends ViewModel {
 
     public LiveData<EvaluationSite> getEvaluationSiteById(long evaluationSiteId) {
         return repository.loadEvaluationSiteByIdFromLocalDatabase(evaluationSiteId);
+    }
+
+
+    public LiveData<EvaluationDTO> getEvaluationDTOByEvaluation(Evaluation evaluation) {
+        return repository.getEvaluationDTOByEvaluation(evaluation);
+    }
+
+    public LiveData<EvaluationSiteWithDetailsDTO> getEvaluationSiteWithDetailsDTOById(long evaluationSiteId) {
+        return repository.getEvaluationSiteWithDetailsDTOById(evaluationSiteId);
     }
 
     // Gestion des Sites

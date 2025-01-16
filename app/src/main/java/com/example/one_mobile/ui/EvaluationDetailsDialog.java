@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +37,15 @@ public class EvaluationDetailsDialog extends DialogFragment {
         this.listener = listener;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9); // 90% of screen width
+            getDialog().getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -45,29 +53,38 @@ public class EvaluationDetailsDialog extends DialogFragment {
         EvaluationSiteViewModelFactory factory = new EvaluationSiteViewModelFactory(requireContext());
         viewModel = new ViewModelProvider(this, factory).get(EvaluationSiteViewModel.class);
 
-
         TextView siteTextView = view.findViewById(R.id.text_site_details);
         TextView risqueTextView = view.findViewById(R.id.text_risque_details);
+        TextView origineTextView = view.findViewById(R.id.text_origine_details);
+        TextView matriceTextView = view.findViewById(R.id.text_matrice_details);
+        TextView regleMatriceTextView = view.findViewById(R.id.text_regle_matrice_details);
+        TextView indiceCalculeTextView = view.findViewById(R.id.text_indice_calculé_details);
         TextView descTextView = view.findViewById(R.id.text_description_details);
         TextView dateTextView = view.findViewById(R.id.text_date_details);
         TextView validityTextView = view.findViewById(R.id.text_validity_details);
 
-        // Remplir les données
+        // Fill in the static data
         siteTextView.setText("Site: " + evaluationSite.getSite().getLib());
-//        risqueTextView.setText("Risque: " + evaluationSite.getEvaluation().getRisque().getLib());
+        indiceCalculeTextView.setText("Indice Calculé: " + evaluationSite.getEvaluation().getIndice());
         descTextView.setText(evaluationSite.getEvaluation().getDesc());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         dateTextView.setText("Date: " + dateFormat.format(evaluationSite.getEvaluation().getDate()));
-       // validityTextView.setText("Validité: " + evaluationSite.getValidite());
+        validityTextView.setText("Validité: " + dateFormat.format(evaluationSite.getEvaluation().getValid()));
 
-        // Scrolling pour la description
-        ScrollView descScroll = view.findViewById(R.id.scroll_description);
+        // Observe the LiveData and update the UI when data is available
+        viewModel.getEvaluationDTOByEvaluation(evaluationSite.getEvaluation()).observe(getViewLifecycleOwner(), evaluationDTO -> {
+            if (evaluationDTO != null) {
+                risqueTextView.setText("Risque: " + evaluationDTO.getRisque().getLib());
+                origineTextView.setText("Origine: " + evaluationDTO.getOrigine().getLib());
+                matriceTextView.setText("Matrice: " + evaluationDTO.getMatrice().getLib());
+                regleMatriceTextView.setText("Règle: " + evaluationDTO.getMatrice().getRegle());
+            }
+        });
 
-        // Boutons
+        // Buttons
         Button modifyButton = view.findViewById(R.id.button_modify);
         Button deleteButton = view.findViewById(R.id.button_delete);
-        Button cancelButton = view.findViewById(R.id.button_cancel);
 
         modifyButton.setOnClickListener(v -> {
             if (listener != null) {
@@ -81,8 +98,6 @@ public class EvaluationDetailsDialog extends DialogFragment {
         deleteButton.setOnClickListener(v -> {
             deleteEvaluationSite();
         });
-
-        cancelButton.setOnClickListener(v -> dismiss());
 
         return view;
     }

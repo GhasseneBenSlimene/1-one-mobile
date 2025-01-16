@@ -127,23 +127,29 @@ public class EvaluationDTO {
 
         String[] dateFormats = {
                 "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-                "yyyy-MM-dd HH:mm:ss",
+                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                "yyyy-MM-dd'T'HH:mm:ssXXX",
+                "yyyy-MM-dd'T'HH:mm:ss'Z'",
                 "yyyy-MM-dd"
         };
-        Date parsedDate = null;
 
+        evaluation.setDate(parseDate(this.getDate(), dateFormats));
+        evaluation.setValid(parseDate(this.getValid(), dateFormats));
+
+        return evaluation;
+    }
+
+    private Date parseDate(String dateString, String[] dateFormats) {
+        if (dateString == null) {
+            return null;
+        }
         for (String format : dateFormats) {
             try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-                parsedDate = dateFormat.parse(this.getDate());
-                break;
+                return new SimpleDateFormat(format).parse(dateString);
             } catch (ParseException e) {
                 // Continue to the next format
             }
         }
-
-        evaluation.setDate(parsedDate);
-
-        return evaluation;
+        return null; // Return null if no format matches
     }
 }

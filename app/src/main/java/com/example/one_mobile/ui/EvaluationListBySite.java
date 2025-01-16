@@ -51,7 +51,7 @@ public class EvaluationListBySite extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recycler_evaluation_risque);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        EvaluationSiteAdapter adapter = new EvaluationSiteAdapter(evaluationSites);
+        EvaluationSiteAdapter adapter = new EvaluationSiteAdapter(evaluationSites, this);
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener(evaluationSite -> {

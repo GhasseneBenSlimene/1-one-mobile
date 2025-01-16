@@ -17,6 +17,15 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
+    <!-- Texte de l'origine -->
+    <TextView
+        android:id="@+id/text_origine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Origine de l'évaluation"
+        android:textColor="#666666"
+        android:textSize="14sp" />
+
     <!-- Texte du risque -->
     <TextView
         android:id="@+id/text_risque"

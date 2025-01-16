@@ -12,13 +12,11 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.local.Dto.EvaluationDTO;
 import com.example.one_mobile.data.local.Dto.EvaluationSiteWithDetailsDTO;
-import com.example.one_mobile.data.model.EvaluationSite;
 import com.example.one_mobile.data.model.Facteur;
 import com.example.one_mobile.data.model.Matrice;
 import com.example.one_mobile.data.model.Origine;
@@ -56,6 +54,7 @@ public class EvaluationSiteUpdateForm extends AppCompatActivity {
     private final HashMap<Long, Object> factorValues = new HashMap<>();
 
     private EvaluationSiteWithDetailsDTO evaluationSite;
+    private long evaluationSiteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,28 +73,50 @@ public class EvaluationSiteUpdateForm extends AppCompatActivity {
         submitButton = findViewById(R.id.submit_button);
 
         // Load the evaluation site data passed from the previous activity
-        long evaluationSiteId = getIntent().getLongExtra("evaluationSiteId", -1);
-        LiveData<EvaluationSite> eval =  viewModel.getEvaluationSiteById(evaluationSiteId);
-//        if (evaluationSiteId != -1) {
-//            viewModel.getEvaluationSiteById(evaluationSiteId).observe(this, evaluationSite -> {
-//                if (evaluationSite != null) {
-//                    this.evaluationSite = evaluationSite;
-//                    // Continue with your existing setup code
-//                    loadSites();
-//                    loadRisks();
-//                    loadOrigins();
-//                    loadMatrices();
-//                } else {
-//                    Toast.makeText(this, "EvaluationSite not found", Toast.LENGTH_SHORT).show();
-//                    finish();
-//                }
-//            });
-//        } else {
-//            Toast.makeText(this, "Invalid EvaluationSite ID", Toast.LENGTH_SHORT).show();
-//            finish();
-//        }
+        evaluationSiteId = getIntent().getLongExtra("evaluationSiteId", -1);
+
+        // Load the existing EvaluationSiteWithDetailsDTO
+        loadEvaluationSiteData();
 
         submitButton.setOnClickListener(v -> submitEvaluationSite());
+    }
+
+    private void loadEvaluationSiteData() {
+        viewModel.getEvaluationSiteWithDetailsDTOById(evaluationSiteId).observe(this, evaluationSiteWithDetailsDTO -> {
+            if (evaluationSiteWithDetailsDTO != null) {
+                evaluationSite = evaluationSiteWithDetailsDTO;
+                populateFormFields();
+            } else {
+                Toast.makeText(this, "Failed to load EvaluationSite", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Redirect to EvaluationListBySite activity
+        super.onBackPressed();
+        Intent intent = new Intent(EvaluationSiteUpdateForm.this, EvaluationListBySite.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clear observers to avoid retaining old data
+        viewModel.getEvaluationSiteWithDetailsDTOById(evaluationSiteId).removeObservers(this);
+    }
+
+    private void populateFormFields() {
+        loadSites();
+        loadRisks();
+        loadOrigins();
+        loadMatrices();
+
+        // Set the description
+        descriptionEditText.setText(evaluationSite.getEvaluation().getDesc());
     }
 
     private void loadSites() {
