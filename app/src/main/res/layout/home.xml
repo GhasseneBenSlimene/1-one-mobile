@@ -18,19 +18,31 @@
         android:textSize="32sp"
         android:textStyle="bold" />
 
-    <!-- Sous-titre -->
+<!--    &lt;!&ndash; Sous-titre &ndash;&gt;-->
+<!--    <TextView-->
+<!--        android:id="@+id/subtitle_unite_travail"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:layout_marginBottom="20dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Unité de travail - Evaluation Standard"-->
+<!--        android:textColor="#666666"-->
+<!--        android:textSize="18sp"-->
+<!--        android:textStyle="italic" />-->
+    <!-- Élément cliquable pour la nouvelle page -->
     <TextView
-        android:id="@+id/subtitle_unite_travail"
+        android:id="@+id/item_evaluation_risque_site"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="20dp"
-        android:gravity="center"
-        android:text="Unité de travail - Evaluation Standard"
-        android:textColor="#666666"
-        android:textSize="18sp"
-        android:textStyle="italic" />
-    <!-- Élément cliquable pour la nouvelle page -->
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/clickable_item_background"
+        android:clickable="true"
+        android:padding="12dp"
+        android:text="Évaluation du risque par site"
+        android:textColor="#000000"
+        android:textSize="18sp" />
+
     <TextView
         android:id="@+id/item_evaluation_risque"
         android:layout_width="match_parent"
@@ -64,17 +76,7 @@
         android:text="Évaluation du risque par action"
         android:textColor="#000000"
         android:textSize="18sp" />
-    <TextView
-        android:id="@+id/item_evaluation_risque_site"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/clickable_item_background"
-        android:clickable="true"
-        android:padding="12dp"
-        android:text="Évaluation du risque par site"
-        android:textColor="#000000"
-        android:textSize="18sp" />
+
     <TextView
         android:id="@+id/item_plans_action"
         android:layout_width="match_parent"

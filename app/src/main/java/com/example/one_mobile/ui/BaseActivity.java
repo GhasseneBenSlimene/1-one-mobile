@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -13,9 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
+import com.example.one_mobile.viewmodel.AuthViewModel;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
-import com.example.one_mobile.viewmodel.AuthViewModel;
 
 public class BaseActivity extends AppCompatActivity {
     private AuthViewModel authViewModel;
@@ -24,6 +23,18 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+        EvaluationSiteViewModel evaluationSiteViewModel = new ViewModelProvider(this).get(EvaluationSiteViewModel.class);
+
+        Button clearDatabaseButton = findViewById(R.id.clearDatabaseButton);
+        clearDatabaseButton.setOnClickListener(v -> {
+            evaluationSiteViewModel.clearDatabase().observe(this, isCleared -> {
+                if (isCleared) {
+                    Toast.makeText(this, "Database cleared successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Failed to clear database", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 
     @Override
@@ -36,9 +47,6 @@ public class BaseActivity extends AppCompatActivity {
     private void setupToolbar() {
         SharedPreferences preferences = getSharedPreferences("userPrefs", MODE_PRIVATE);
         String username = preferences.getString("username", "Utilisateur");
-
-        TextView usernameTextView = findViewById(R.id.usernameTextView);
-        usernameTextView.setText("Bonjour, " + username);
 
         Button homeButton = findViewById(R.id.homeButton);
         homeButton.setOnClickListener(v -> {
