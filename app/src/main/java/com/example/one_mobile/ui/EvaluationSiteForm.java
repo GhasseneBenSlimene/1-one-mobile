@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
@@ -35,7 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class EvaluationSiteForm extends AppCompatActivity {
+public class EvaluationSiteForm extends BaseActivity {
 
     private EvaluationSiteViewModel viewModel;
 
@@ -78,6 +77,16 @@ public class EvaluationSiteForm extends AppCompatActivity {
         loadMatrices();
 
         submitButton.setOnClickListener(v -> submitEvaluationSite());
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Redirect to EvaluationListBySite activity
+        super.onBackPressed();
+        Intent intent = new Intent(EvaluationSiteForm.this, EvaluationListBySite.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void loadSites() {

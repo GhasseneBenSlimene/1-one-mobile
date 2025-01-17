@@ -18,44 +18,30 @@ import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
 
 public class BaseActivity extends AppCompatActivity {
     private AuthViewModel authViewModel;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+        preferences = getSharedPreferences("userPrefs", MODE_PRIVATE);
+        setContentView(R.layout.base_activity);
+        setupToolbar();
     }
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        getLayoutInflater().inflate(R.layout.toolbar, findViewById(android.R.id.content), true);
+        getLayoutInflater().inflate(R.layout.base_activity, findViewById(android.R.id.content), true);
         setupToolbar();
     }
 
     private void setupToolbar() {
-        SharedPreferences preferences = getSharedPreferences("userPrefs", MODE_PRIVATE);
-
         Button homeButton = findViewById(R.id.homeButton);
-        homeButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, Home.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
+        homeButton.setOnClickListener(v -> navigateToHome());
 
         Button logoutButton = findViewById(R.id.logoutButton);
-        logoutButton.setOnClickListener(v -> {
-            authViewModel.logout().observe(this, success -> {
-                if (success) {
-                    preferences.edit().clear().apply();
-                    Intent intent = new Intent(this, AuthActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(this, "Failed to logout", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
+        logoutButton.setOnClickListener(v -> handleLogout());
 
         Button syncButton = findViewById(R.id.syncButton);
         syncButton.setOnClickListener(v -> syncData());
@@ -67,10 +53,31 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        navigateToHome();
+    }
+
+    private void navigateToHome() {
         Intent intent = new Intent(this, Home.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void handleLogout() {
+        authViewModel.logout().observe(this, success -> {
+            if (success) {
+                preferences.edit().clear().apply();
+                navigateToAuthPage();
+            } else {
+                Toast.makeText(this, "Failed to logout", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void navigateToAuthPage() {
+        Intent intent = new Intent(this, AuthActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     private void syncData() {

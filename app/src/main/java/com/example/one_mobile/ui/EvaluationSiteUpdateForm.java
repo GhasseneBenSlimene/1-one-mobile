@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
@@ -34,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class EvaluationSiteUpdateForm extends AppCompatActivity {
+public class EvaluationSiteUpdateForm extends BaseActivity {
 
     private EvaluationSiteViewModel viewModel;
 

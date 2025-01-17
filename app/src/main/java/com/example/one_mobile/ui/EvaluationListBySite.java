@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,7 +16,7 @@ import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
 
 import java.util.List;
 
-public class EvaluationListBySite extends AppCompatActivity {
+public class EvaluationListBySite extends BaseActivity {
 
     private EvaluationSiteViewModel viewModel;
 
