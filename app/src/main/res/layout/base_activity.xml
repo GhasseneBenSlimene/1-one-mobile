@@ -10,7 +10,7 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="end"
         android:orientation="horizontal"
         android:paddingEnd="16dp"
@@ -18,58 +18,58 @@
 
         <Button
             android:id="@+id/homeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Accueil"
-            android:drawableLeft="@drawable/home"
-            android:background="?attr/selectableItemBackground"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif"
-            android:padding="8dp"
+            android:layout_width="127dp"
+            android:layout_height="match_parent"
             android:layout_marginEnd="8dp"
-            android:gravity="center_vertical" />
+            android:background="?attr/selectableItemBackground"
+            android:drawableLeft="@drawable/home"
+            android:fontFamily="sans-serif"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="Accueil"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/syncButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sync"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackground"
             android:drawableLeft="@drawable/baseline_sync_24"
-            android:background="?attr/selectableItemBackground"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
             android:fontFamily="sans-serif"
+            android:gravity="center_vertical"
             android:padding="8dp"
-            android:layout_marginEnd="8dp"
-            android:gravity="center_vertical" />
+            android:text="Sync"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
 
-        <Button
-            android:id="@+id/clearDatabaseButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Vider le cache"
-            android:drawableLeft="@drawable/delete"
-            android:background="?attr/selectableItemBackground"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif"
-            android:padding="8dp"
-            android:layout_marginEnd="8dp"
-            android:gravity="center_vertical" />
+        <!--        <Button-->
+        <!--            android:id="@+id/clearDatabaseButton"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:text="Vider le cache"-->
+        <!--            android:drawableLeft="@drawable/delete"-->
+        <!--            android:background="?attr/selectableItemBackground"-->
+        <!--            android:textColor="@android:color/black"-->
+        <!--            android:textSize="14sp"-->
+        <!--            android:fontFamily="sans-serif"-->
+        <!--            android:padding="8dp"-->
+        <!--            android:layout_marginEnd="8dp"-->
+        <!--            android:gravity="center_vertical" />-->
 
         <Button
             android:id="@+id/logoutButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Déconnexion"
-            android:drawableLeft="@drawable/logout"
             android:background="?attr/selectableItemBackground"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
+            android:drawableLeft="@drawable/logout"
             android:fontFamily="sans-serif"
+            android:gravity="center_vertical"
             android:padding="8dp"
-            android:gravity="center_vertical" />
+            android:text="Se déconnecter"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
 
     </LinearLayout>
 </androidx.appcompat.widget.Toolbar>

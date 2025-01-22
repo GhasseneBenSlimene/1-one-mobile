@@ -2,6 +2,7 @@ package com.example.one_mobile.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -292,6 +293,10 @@ public class EvaluationSiteUpdateForm extends BaseActivity {
             return;
         }
 
+        // Clear previous factors
+        factorsContainer.removeAllViews();
+        factorValues.clear();
+
         // Observer pour charger les facteurs liés à la matrice
         viewModel.getFacteursByMatriceId(selectedMatrice.getId()).observe(this, facteurs -> {
             if (facteurs != null && !facteurs.isEmpty()) {
@@ -314,7 +319,8 @@ public class EvaluationSiteUpdateForm extends BaseActivity {
                                 LinearLayout.LayoutParams.MATCH_PARENT,
                                 LinearLayout.LayoutParams.WRAP_CONTENT
                         ));
-
+                        spinner.setPadding(16, 12, 16, 12);
+                        spinner.setBackgroundResource(R.drawable.spinner_bg);
                         // Observer pour charger les valeurs liées au facteur
                         viewModel.getValeursByFacteurId(facteur.getId()).observe(this, valeurs -> {
                             if (valeurs != null && !valeurs.isEmpty()) {
@@ -395,6 +401,7 @@ public class EvaluationSiteUpdateForm extends BaseActivity {
         float product = 1.0f;
         for (Long key : factorValues.keySet()) {
             Object value = factorValues.get(key);
+            Log.d("Key", String.valueOf(key));
             if (value instanceof EditText) {
                 String text = ((EditText) value).getText().toString();
                 if (!text.isEmpty()) {
@@ -408,6 +415,8 @@ public class EvaluationSiteUpdateForm extends BaseActivity {
                 }
             }
         }
+
+        Log.d("Product", String.valueOf(product));
         return product;
     }
 }

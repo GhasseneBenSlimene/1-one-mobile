@@ -1,98 +1,193 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".ui.Home">
 
-    <!-- Grand Titre -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="291dp"
+        android:layout_height="179dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/ic_logo"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/title_document_unique"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="Document Unique"
-        android:textColor="#000000"
-        android:textSize="32sp"
-        android:textStyle="bold" />
+        android:textColor="#FFFFFF"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:background="@drawable/rounded_gradient_background"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp"
+        android:elevation="8dp"
+        android:layout_marginBottom="240dp"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logo"
+        app:layout_constraintBottom_toTopOf="@id/item_evaluation_risque_site"
+        android:layout_alignParentStart="true" />
 
-<!--    &lt;!&ndash; Sous-titre &ndash;&gt;-->
-<!--    <TextView-->
-<!--        android:id="@+id/subtitle_unite_travail"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="8dp"-->
-<!--        android:layout_marginBottom="20dp"-->
-<!--        android:gravity="center"-->
-<!--        android:text="Unité de travail - Evaluation Standard"-->
-<!--        android:textColor="#666666"-->
-<!--        android:textSize="18sp"-->
-<!--        android:textStyle="italic" />-->
-    <!-- Élément cliquable pour la nouvelle page -->
-    <TextView
+    <androidx.cardview.widget.CardView
         android:id="@+id/item_evaluation_risque_site"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/clickable_item_background"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/title_document_unique"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
         android:clickable="true"
-        android:padding="12dp"
-        android:text="Évaluation du risque par site"
-        android:textColor="#000000"
-        android:textSize="18sp" />
+        android:focusable="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackground">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Évaluation du risque par site"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_item_background"
+            android:drawableStart="@drawable/view_list"
+            android:drawablePadding="16dp"
+            android:layout_gravity="center_vertical"/>
+    </androidx.cardview.widget.CardView>
 
-    <TextView
+    <androidx.cardview.widget.CardView
         android:id="@+id/item_evaluation_risque"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/clickable_item_background"
+        app:layout_constraintTop_toBottomOf="@id/item_evaluation_risque_site"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
         android:clickable="true"
-        android:padding="12dp"
-        android:text="Évaluation du risque par Unité de travail"
-        android:textColor="#000000"
-        android:textSize="18sp" />
-    <TextView
-    android:id="@+id/item_evaluation_risque_poste"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
-    android:background="@drawable/clickable_item_background"
-    android:clickable="true"
-    android:padding="12dp"
-    android:text="Évaluation du risque par poste"
-    android:textColor="#000000"
-    android:textSize="18sp" />
-    <TextView
+        android:focusable="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackground">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Évaluation du risque par Unité de travail"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_item_background"
+            android:drawableStart="@drawable/view_list"
+            android:drawablePadding="16dp"
+            android:layout_gravity="center_vertical"/>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/item_evaluation_risque_poste"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/item_evaluation_risque"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackground">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Évaluation du risque par poste"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_item_background"
+            android:drawableStart="@drawable/view_list"
+            android:drawablePadding="16dp"
+            android:layout_gravity="center_vertical"/>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
         android:id="@+id/item_evaluation_risque_action"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/clickable_item_background"
+        app:layout_constraintTop_toBottomOf="@id/item_evaluation_risque_poste"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
         android:clickable="true"
-        android:padding="12dp"
-        android:text="Évaluation du risque par action"
-        android:textColor="#000000"
-        android:textSize="18sp" />
+        android:focusable="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackground">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Évaluation du risque par action"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_item_background"
+            android:drawableStart="@drawable/view_list"
+            android:drawablePadding="16dp"
+            android:layout_gravity="center_vertical"/>
+    </androidx.cardview.widget.CardView>
 
-    <TextView
+    <androidx.cardview.widget.CardView
         android:id="@+id/item_plans_action"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Plans d'action par Unité de travail"
-        android:padding="12dp"
-        android:textSize="18sp"
-        android:background="@drawable/clickable_item_background"
-        android:textColor="#000000"
+        app:layout_constraintTop_toBottomOf="@id/item_evaluation_risque_action"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
         android:clickable="true"
-        android:layout_marginBottom="10dp" />
+        android:focusable="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackground">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Plans d'action par Unité de travail"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_item_background"
+            android:drawableStart="@drawable/view_list"
+            android:drawablePadding="16dp"
+            android:layout_gravity="center_vertical"/>
+    </androidx.cardview.widget.CardView>
 
-
-
-</LinearLayout>
-
-
-
-
+</androidx.constraintlayout.widget.ConstraintLayout>

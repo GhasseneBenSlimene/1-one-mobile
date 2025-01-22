@@ -46,8 +46,8 @@ public class BaseActivity extends AppCompatActivity {
         Button syncButton = findViewById(R.id.syncButton);
         syncButton.setOnClickListener(v -> syncData());
 
-        Button clearDatabaseButton = findViewById(R.id.clearDatabaseButton);
-        clearDatabaseButton.setOnClickListener(v -> clearDatabase());
+//        Button clearDatabaseButton = findViewById(R.id.clearDatabaseButton);
+//        clearDatabaseButton.setOnClickListener(v -> clearDatabase());
     }
 
     @Override

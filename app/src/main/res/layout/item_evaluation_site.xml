@@ -1,46 +1,59 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
+    android:layout_marginBottom="16dp"
     android:background="#FFFFFF"
-    android:elevation="2dp"
+    android:elevation="4dp"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:clipToPadding="false"
+    android:radius="10dp">
 
-    <!-- Texte du site -->
+    <!-- Title: Site Name -->
     <TextView
         android:id="@+id/text_site"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Nom du site"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textColor="#212121"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
+        android:fontFamily="sans-serif-medium"/>
 
-    <!-- Texte de l'origine -->
+    <!-- Subtitle: Origin of the Evaluation -->
     <TextView
         android:id="@+id/text_origine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Origine de l'évaluation"
-        android:textColor="#666666"
-        android:textSize="14sp" />
+        android:textColor="#616161"
+        android:textSize="15sp"
+        android:paddingBottom="8dp"
+        android:fontFamily="sans-serif" />
 
-    <!-- Texte du risque -->
+    <!-- Risk Level -->
     <TextView
-        android:id="@+id/text_risque"
+        android:id="@+id/text_indice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Niveau de risque"
-        android:textColor="#666666"
-        android:textSize="14sp" />
+        android:text="Indice de Gravité"
+        android:textColor="#FF5722"
+        android:textSize="15sp"
+        android:paddingBottom="8dp"
+        android:fontFamily="sans-serif" />
 
-    <!-- Texte de description -->
+    <!-- Description of the Evaluation -->
     <TextView
         android:id="@+id/text_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Description de l'évaluation"
-        android:textColor="#888888"
-        android:textSize="14sp" />
+        android:textColor="#757575"
+        android:textSize="14sp"
+        android:paddingBottom="12dp"
+        android:fontFamily="sans-serif-light" />
 </LinearLayout>

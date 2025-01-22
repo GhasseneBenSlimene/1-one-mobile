@@ -2,127 +2,158 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#F4F4F4">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:radius="12dp"
+        android:clipToPadding="false"
+        android:layout_gravity="center">
 
         <!-- Title -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Evaluation Site Form"
-            android:textSize="24sp"
+            android:text="Évaluation du risque par site"
+            android:textSize="26sp"
             android:textStyle="bold"
+            android:textColor="#212121"
             android:gravity="center"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="24dp"
+            android:fontFamily="sans-serif-medium"/>
 
         <!-- Select Site -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Site"
+            android:text="Sélection du Site"
             android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#616161"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif" />
 
         <Spinner
             android:id="@+id/site_spinner"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:minHeight="48dp"
-            android:padding="8dp"
+            android:background="@drawable/spinner_bg"
+            android:padding="10dp"
             android:layout_marginBottom="16dp" />
 
         <!-- Select Risk -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Risk"
+            android:text="Sélection du Risque"
             android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#616161"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif" />
 
         <Spinner
             android:id="@+id/risk_spinner"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:minHeight="48dp"
-            android:padding="8dp"
+            android:background="@drawable/spinner_bg"
+            android:padding="10dp"
             android:layout_marginBottom="16dp" />
 
         <!-- Select Origin -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Origin"
+            android:text="Sélection de l'Origine"
             android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#616161"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif" />
 
         <Spinner
             android:id="@+id/origin_spinner"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:minHeight="48dp"
-            android:padding="8dp"
+            android:background="@drawable/spinner_bg"
+            android:padding="10dp"
             android:layout_marginBottom="16dp" />
 
         <!-- Select Matrix -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Matrix"
+            android:text="Sélection de la Matrice"
             android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#616161"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif" />
 
         <Spinner
             android:id="@+id/matrice_spinner"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:minHeight="48dp"
-            android:padding="8dp"
+            android:background="@drawable/spinner_bg"
+            android:padding="10dp"
             android:layout_marginBottom="16dp" />
 
         <!-- Dynamic Factors Container -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Factors"
+            android:text="Facteurs"
             android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#616161"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="sans-serif" />
 
         <LinearLayout
             android:id="@+id/factors_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="8dp" />
 
         <!-- Enter Description -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enter Description"
+            android:text="Description"
             android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#616161"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif" />
 
         <EditText
             android:id="@+id/description_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Description"
+            android:hint="Entrez une Description"
             android:inputType="textMultiLine"
             android:minHeight="100dp"
             android:gravity="top"
+            android:background="@drawable/edittext_bg"
+            android:padding="12dp"
+            android:textColor="#212121"
             android:layout_marginBottom="16dp" />
 
         <!-- Submit Button -->
         <Button
             android:id="@+id/submit_button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Submit"
-            android:layout_marginTop="20dp" />
+            android:layout_height="48dp"
+            android:text="Valider"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_bg"
+            android:layout_marginTop="20dp"
+            android:textSize="16sp" />
 
     </LinearLayout>
 </ScrollView>

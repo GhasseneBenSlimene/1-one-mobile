@@ -1,9 +1,13 @@
 <resources>
-    <string name="app_name">My Application</string>
-    <string name="username">Username</string>
-    <string name="password">Password</string>
-    <string name="login">Login</string>
-    <string name="forgot_password">Forgot Password?</string>
+    <string name="app_name">1-One</string>
+    <string name="username">Identifiant</string>
+    <string name="password">Mot de Passe</string>
+    <string name="login">Se connecter</string>
+    <string name="forgot_password">Mot de passe oublié ?</string>
+    <string name="home">Accueil</string>
+    <string name="sync">Sync</string>
+    <string name="clear_database">Vider le cache</string>
+    <string name="logout">Déconnexion</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

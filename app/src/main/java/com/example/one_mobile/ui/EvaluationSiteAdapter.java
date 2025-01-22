@@ -1,5 +1,6 @@
 package com.example.one_mobile.ui;
 
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +60,21 @@ public class EvaluationSiteAdapter extends RecyclerView.Adapter<EvaluationSiteAd
         // Observe the LiveData and update the UI when data is available
         holder.viewModel.getEvaluationDTOByEvaluation(evaluationSite.getEvaluation()).observe(lifecycleOwner, evaluationDTO -> {
             if (evaluationDTO != null) {
-                holder.risqueTextView.setText("Risque: " + evaluationDTO.getRisque().getLib());
+                int severityIndex = (int) evaluationDTO.getIndice();
+                holder.indiceTextView.setText("Indice de gravité: " + severityIndex);
+
+                // Set text color based on severity index
+                if (severityIndex >= 0 && severityIndex <= 3) {
+                    holder.indiceTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_green_dark));
+                } else if (severityIndex >= 4 && severityIndex <= 8) {
+                    holder.indiceTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_orange_dark));
+                } else {
+                    holder.indiceTextView.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
+                }
+
+                // Make the text bold
+                holder.indiceTextView.setTypeface(null, Typeface.BOLD);
+
                 holder.origineTextView.setText("Origine: " + evaluationDTO.getOrigine().getLib());
             }
         });
@@ -85,7 +100,7 @@ public class EvaluationSiteAdapter extends RecyclerView.Adapter<EvaluationSiteAd
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView siteTextView, origineTextView, risqueTextView, descriptionTextView;
+        TextView siteTextView, origineTextView, indiceTextView, descriptionTextView;
         EvaluationSiteViewModel viewModel;
 
         public ViewHolder(@NonNull View itemView, EvaluationSiteViewModel viewModel) {
@@ -93,7 +108,7 @@ public class EvaluationSiteAdapter extends RecyclerView.Adapter<EvaluationSiteAd
             this.viewModel = viewModel;
             siteTextView = itemView.findViewById(R.id.text_site);
             origineTextView = itemView.findViewById(R.id.text_origine);
-            risqueTextView = itemView.findViewById(R.id.text_risque);
+            indiceTextView = itemView.findViewById(R.id.text_indice);
             descriptionTextView = itemView.findViewById(R.id.text_description);
         }
     }

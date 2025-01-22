@@ -246,6 +246,9 @@ public class EvaluationSiteForm extends BaseActivity {
                                 LinearLayout.LayoutParams.WRAP_CONTENT
                         ));
 
+                        spinner.setPadding(16, 12, 16, 12);
+                        spinner.setBackgroundResource(R.drawable.spinner_bg);
+
                         // Observer pour charger les valeurs liées au facteur
                         viewModel.getValeursByFacteurId(facteur.getId()).observe(this, valeurs -> {
                             if (valeurs != null && !valeurs.isEmpty()) {
