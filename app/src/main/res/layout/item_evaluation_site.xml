@@ -24,12 +24,12 @@
         android:paddingBottom="4dp"
         android:fontFamily="sans-serif-medium"/>
 
-    <!-- Subtitle: Origin of the Evaluation -->
+    <!-- Subtitle: Risque of the Evaluation -->
     <TextView
-        android:id="@+id/text_origine"
+        android:id="@+id/text_risque"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Origine de l'évaluation"
+        android:text="Risque de l'évaluation"
         android:textColor="#616161"
         android:textSize="15sp"
         android:paddingBottom="8dp"

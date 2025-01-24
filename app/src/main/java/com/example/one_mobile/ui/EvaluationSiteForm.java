@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -229,6 +230,14 @@ public class EvaluationSiteForm extends BaseActivity {
                 factorsContainer.removeAllViews();
 
                 for (Facteur facteur : facteurs) {
+                    // Add TextView for factor name and code
+                    TextView factorNameTextView = new TextView(this);
+                    factorNameTextView.setText(facteur.getCode() + ": " + facteur.getLib());
+                    factorNameTextView.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    ));
+                    factorsContainer.addView(factorNameTextView);
                     if (facteur.getType() == 0) { // Type Libre
                         EditText editText = new EditText(this);
                         editText.setHint(facteur.getLib());

@@ -75,7 +75,7 @@ public class EvaluationSiteAdapter extends RecyclerView.Adapter<EvaluationSiteAd
                 // Make the text bold
                 holder.indiceTextView.setTypeface(null, Typeface.BOLD);
 
-                holder.origineTextView.setText("Origine: " + evaluationDTO.getOrigine().getLib());
+                holder.risqueTextView.setText("Risque: " + evaluationDTO.getRisque().getLib());
             }
         });
 
@@ -100,14 +100,14 @@ public class EvaluationSiteAdapter extends RecyclerView.Adapter<EvaluationSiteAd
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView siteTextView, origineTextView, indiceTextView, descriptionTextView;
+        TextView siteTextView, risqueTextView, indiceTextView, descriptionTextView;
         EvaluationSiteViewModel viewModel;
 
         public ViewHolder(@NonNull View itemView, EvaluationSiteViewModel viewModel) {
             super(itemView);
             this.viewModel = viewModel;
             siteTextView = itemView.findViewById(R.id.text_site);
-            origineTextView = itemView.findViewById(R.id.text_origine);
+            risqueTextView = itemView.findViewById(R.id.text_risque);
             indiceTextView = itemView.findViewById(R.id.text_indice);
             descriptionTextView = itemView.findViewById(R.id.text_description);
         }
