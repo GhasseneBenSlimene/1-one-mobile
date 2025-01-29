@@ -5,6 +5,11 @@ import android.os.Bundle;
 import androidx.cardview.widget.CardView;
 
 import com.example.one_mobile.R;
+import com.example.one_mobile.ui.evaluationAction.EvaluationListByAction;
+import com.example.one_mobile.ui.evaluationPost.EvaluationListByPost;
+import com.example.one_mobile.ui.evaluationSite.EvaluationListBySite;
+import com.example.one_mobile.ui.evaluationUtr.ActionPlansByUtr;
+import com.example.one_mobile.ui.evaluationUtr.EvaluationListByUtr;
 
 public class Home extends BaseActivity {
 

@@ -1,7 +1,8 @@
-package com.example.one_mobile.ui;
+package com.example.one_mobile.ui.evaluationSite;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,6 +24,7 @@ import com.example.one_mobile.data.model.Origine;
 import com.example.one_mobile.data.model.Risque;
 import com.example.one_mobile.data.model.Site;
 import com.example.one_mobile.data.model.Valeur;
+import com.example.one_mobile.ui.BaseActivity;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
 
@@ -34,13 +36,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-
-public class EvaluationSiteForm extends BaseActivity {
+public class EvaluationSiteUpdateForm extends BaseActivity {
 
     private EvaluationSiteViewModel viewModel;
 
     private Spinner siteSpinner;
-
     private Spinner riskSpinner;
     private Spinner originSpinner;
     private Spinner matriceSpinner;
@@ -49,17 +49,19 @@ public class EvaluationSiteForm extends BaseActivity {
     private Button submitButton;
 
     private Site selectedSite;
-
     private Risque selectedRisque;
     private Origine selectedOrigine;
     private Matrice selectedMatrice;
 
     private final HashMap<Long, Object> factorValues = new HashMap<>();
 
+    private EvaluationSiteWithDetailsDTO evaluationSite;
+    private long evaluationSiteId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.evaluation_site_form);
+        setContentView(R.layout.evaluation_site_update_form);
 
         EvaluationSiteViewModelFactory factory = new EvaluationSiteViewModelFactory(this);
         viewModel = new ViewModelProvider(this, factory).get(EvaluationSiteViewModel.class);
@@ -72,22 +74,51 @@ public class EvaluationSiteForm extends BaseActivity {
         factorsContainer = findViewById(R.id.factors_container);
         submitButton = findViewById(R.id.submit_button);
 
-        loadSites();
-        loadRisks();
-        loadOrigins();
-        loadMatrices();
+        // Load the evaluation site data passed from the previous activity
+        evaluationSiteId = getIntent().getLongExtra("evaluationSiteId", -1);
+
+        // Load the existing EvaluationSiteWithDetailsDTO
+        loadEvaluationSiteData();
 
         submitButton.setOnClickListener(v -> submitEvaluationSite());
+    }
+
+    private void loadEvaluationSiteData() {
+        viewModel.getEvaluationSiteWithDetailsDTOById(evaluationSiteId).observe(this, evaluationSiteWithDetailsDTO -> {
+            if (evaluationSiteWithDetailsDTO != null) {
+                evaluationSite = evaluationSiteWithDetailsDTO;
+                populateFormFields();
+            } else {
+                Toast.makeText(this, "Failed to load EvaluationSite", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public void onBackPressed() {
         // Redirect to EvaluationListBySite activity
         super.onBackPressed();
-        Intent intent = new Intent(EvaluationSiteForm.this, EvaluationListBySite.class);
+        Intent intent = new Intent(EvaluationSiteUpdateForm.this, EvaluationListBySite.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clear observers to avoid retaining old data
+        viewModel.getEvaluationSiteWithDetailsDTOById(evaluationSiteId).removeObservers(this);
+    }
+
+    private void populateFormFields() {
+        loadSites();
+        loadRisks();
+        loadOrigins();
+        loadMatrices();
+
+        // Set the description
+        descriptionEditText.setText(evaluationSite.getEvaluation().getDesc());
     }
 
     private void loadSites() {
@@ -118,11 +149,21 @@ public class EvaluationSiteForm extends BaseActivity {
                         selectedSite = null;
                     }
                 });
+
+                // Set the selected site
+                if (evaluationSite != null) {
+                    for (int i = 0; i < sites.size(); i++) {
+                        if (sites.get(i).getId() == evaluationSite.getSite().getId()) {
+                            siteSpinner.setSelection(i + 1); // Adjust for placeholder
+                            break;
+                        }
+                    }
+                }
             }
         });
     }
 
-    private void loadRisks(){
+    private void loadRisks() {
         viewModel.getAllRisques().observe(this, risques -> {
             if (risques != null && !risques.isEmpty()) {
                 List<String> risqueNames = new ArrayList<>();
@@ -150,6 +191,16 @@ public class EvaluationSiteForm extends BaseActivity {
                         selectedRisque = null;
                     }
                 });
+
+                // Set the selected risk
+                if (evaluationSite != null && evaluationSite.getEvaluation().getRisque() != null) {
+                    for (int i = 0; i < risques.size(); i++) {
+                        if (risques.get(i).getId() == evaluationSite.getEvaluation().getRisque().getId()) {
+                            riskSpinner.setSelection(i + 1); // Adjust for placeholder
+                            break;
+                        }
+                    }
+                }
             }
         });
     }
@@ -181,6 +232,16 @@ public class EvaluationSiteForm extends BaseActivity {
                         selectedOrigine = null;
                     }
                 });
+
+                // Set the selected origin
+                if (evaluationSite != null && evaluationSite.getEvaluation().getOrigine() != null) {
+                    for (int i = 0; i < origins.size(); i++) {
+                        if (origins.get(i).getId() == evaluationSite.getEvaluation().getOrigine().getId()) {
+                            originSpinner.setSelection(i + 1); // Adjust for placeholder
+                            break;
+                        }
+                    }
+                }
             }
         });
     }
@@ -215,6 +276,16 @@ public class EvaluationSiteForm extends BaseActivity {
                         factorsContainer.removeAllViews();
                     }
                 });
+
+                // Set the selected matrix
+                if (evaluationSite != null && evaluationSite.getEvaluation().getMatrice() != null) {
+                    for (int i = 0; i < matrices.size(); i++) {
+                        if (matrices.get(i).getId() == evaluationSite.getEvaluation().getMatrice().getId()) {
+                            matriceSpinner.setSelection(i + 1); // Adjust for placeholder
+                            break;
+                        }
+                    }
+                }
             }
         });
     }
@@ -223,6 +294,10 @@ public class EvaluationSiteForm extends BaseActivity {
         if (selectedMatrice == null) {
             return;
         }
+
+        // Clear previous factors
+        factorsContainer.removeAllViews();
+        factorValues.clear();
 
         // Observer pour charger les facteurs liés à la matrice
         viewModel.getFacteursByMatriceId(selectedMatrice.getId()).observe(this, facteurs -> {
@@ -254,10 +329,8 @@ public class EvaluationSiteForm extends BaseActivity {
                                 LinearLayout.LayoutParams.MATCH_PARENT,
                                 LinearLayout.LayoutParams.WRAP_CONTENT
                         ));
-
                         spinner.setPadding(16, 12, 16, 12);
                         spinner.setBackgroundResource(R.drawable.spinner_bg);
-
                         // Observer pour charger les valeurs liées au facteur
                         viewModel.getValeursByFacteurId(facteur.getId()).observe(this, valeurs -> {
                             if (valeurs != null && !valeurs.isEmpty()) {
@@ -283,7 +356,6 @@ public class EvaluationSiteForm extends BaseActivity {
         });
     }
 
-
     private void submitEvaluationSite() {
         String description = descriptionEditText.getText().toString();
 
@@ -292,21 +364,12 @@ public class EvaluationSiteForm extends BaseActivity {
             return;
         }
 
-        // Create EvaluationSite
-        EvaluationSiteWithDetailsDTO evaluationSite = new EvaluationSiteWithDetailsDTO();
-
-        // Ensure that the evaluation object is initialized
-        if (evaluationSite.getEvaluation() == null) {
-            evaluationSite.setEvaluation(new EvaluationDTO()); // Manually initialize if it's null
-        }
-
         // Populate the Evaluation object inside EvaluationSite
         EvaluationDTO evaluation = evaluationSite.getEvaluation();
         evaluation.setRisque(selectedRisque);
         evaluation.setOrigine(selectedOrigine);
         evaluation.setMatrice(selectedMatrice);
         evaluation.setDesc(description);
-        // evaluation.setDescCourt(description);
 
         // Calculate the product of factor values
         float product = calculateFactorValuesProduct();
@@ -326,30 +389,29 @@ public class EvaluationSiteForm extends BaseActivity {
         String validDate = sdf.format(calendar.getTime());
         evaluation.setValid(validDate);
 
-
         // Set the EvaluationSite properties
         evaluationSite.setSite(selectedSite);
         evaluationSite.setEvaluation(evaluation);
 
-        viewModel.createEvaluationSite(evaluationSite).observe(this, createdEvaluationSite -> {
-            if (createdEvaluationSite != null) {
-                Toast.makeText(this, "EvaluationSite created successfully!", Toast.LENGTH_SHORT).show();
+        viewModel.updateEvaluationSite(evaluationSite.getId(), evaluationSite).observe(this, updatedEvaluationSite -> {
+            if (updatedEvaluationSite != null) {
+                Toast.makeText(this, "EvaluationSite updated successfully!", Toast.LENGTH_SHORT).show();
                 // Redirect to EvaluationListBySite activity
-                Intent intent = new Intent(EvaluationSiteForm.this, EvaluationListBySite.class);
+                Intent intent = new Intent(EvaluationSiteUpdateForm.this, EvaluationListBySite.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
             } else {
-                Toast.makeText(this, "Failed to create EvaluationSite", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Failed to update EvaluationSite", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 
     private float calculateFactorValuesProduct() {
         float product = 1.0f;
         for (Long key : factorValues.keySet()) {
             Object value = factorValues.get(key);
+            Log.d("Key", String.valueOf(key));
             if (value instanceof EditText) {
                 String text = ((EditText) value).getText().toString();
                 if (!text.isEmpty()) {
@@ -363,6 +425,8 @@ public class EvaluationSiteForm extends BaseActivity {
                 }
             }
         }
+
+        Log.d("Product", String.valueOf(product));
         return product;
     }
 }

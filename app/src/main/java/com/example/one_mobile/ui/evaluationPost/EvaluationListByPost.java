@@ -1,4 +1,4 @@
-package com.example.one_mobile.ui;
+package com.example.one_mobile.ui.evaluationPost;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;

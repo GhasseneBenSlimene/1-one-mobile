@@ -1,4 +1,4 @@
-package com.example.one_mobile.ui;
+package com.example.one_mobile.ui.evaluationSite;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.one_mobile.R;
 import com.example.one_mobile.data.model.EvaluationSiteWithDetails;
+import com.example.one_mobile.ui.BaseActivity;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;
 

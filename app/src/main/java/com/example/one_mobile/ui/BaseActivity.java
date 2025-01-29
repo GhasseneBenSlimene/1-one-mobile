@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
+import com.example.one_mobile.ui.auth.AuthActivity;
 import com.example.one_mobile.viewmodel.AuthViewModel;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModel;
 import com.example.one_mobile.viewmodel.EvaluationSiteViewModelFactory;

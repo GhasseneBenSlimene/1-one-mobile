@@ -1,4 +1,4 @@
-package com.example.one_mobile.ui;
+package com.example.one_mobile.ui.auth;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.one_mobile.R;
+import com.example.one_mobile.ui.Home;
 import com.example.one_mobile.viewmodel.AuthViewModel;
 
 public class AuthActivity extends AppCompatActivity {
